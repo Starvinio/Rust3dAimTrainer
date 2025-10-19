@@ -1,0 +1,9 @@
+# Ignore compiled files
+target/
+
+# Backup files
+**/*.rs.bk
+
+# IDEs
+.vscode/
+.idea/
