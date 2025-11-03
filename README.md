@@ -7,5 +7,9 @@ This is only a demo version.
 ## Upcoming Features:
 - Wall Texturing
 - Bean-Shaped and Humanoid Targets
-- Moving Targets
-- CLI config customization
+- Randomly Moving Targets
+- Phyics-Based Moving Targets
+- Cone- and Octagon-Shaped Rooms
+- Sound Effects
+- Additional Scenarios
+- On-Screen GUI
