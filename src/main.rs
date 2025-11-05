@@ -1,13 +1,15 @@
 #![warn(unused_extern_crates)]
 
+use std::{io,time::Duration};
+
 pub mod engine;
 
-use engine::consts::{BLUE, RESET};
-use engine::scenarios::*;
-use std::{io, time::Duration};
+use crate::engine::core::{BLUE, RESET};
+use crate::engine::scenario::map_scenario;
 
 fn main() {
-    engine::helpers::draw_logo();
+    engine::rendering::draw_logo();
+
     println!("Welcome to the Rust 3D Aim Trainer Demo Version!\n");
 
     println!(
@@ -20,8 +22,10 @@ fn main() {
     println!("[{}3{}] 1 Wall 6 Targets TE", BLUE, RESET);
     println!("[{}4{}] 1 Wall 6 Targets Small", BLUE, RESET);
     println!("[{}5{}] 1 Wall 6 Targets Extra Small", BLUE, RESET);
+    println!("[{}6{}] 1 Wall 5 Targets Pasu", BLUE, RESET);
+    println!("[{}7{}] 1 Wall 1 Target Spheretrack", BLUE, RESET);
 
-    let scenario = 'scenario: loop {
+    let mut scenario = 'scenario: loop {
         let mut input = String::new();
         io::stdin()
             .read_line(&mut input)
@@ -36,5 +40,5 @@ fn main() {
         };
     };
 
-    engine::run(scenario, Duration::from_secs(30));
+    engine::runtime::run(&mut scenario, Duration::from_secs(30));
 }

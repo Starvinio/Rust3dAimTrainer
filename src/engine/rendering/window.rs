@@ -4,7 +4,10 @@ use winit::window::CursorGrabMode;
 use winit::window::Fullscreen;
 use winit::window::{Window, WindowBuilder};
 
-use crate::engine::consts::CONFIG;
+
+use crate::engine::{CONFIG};
+
+
 
 pub fn event_loop_setup() -> (EventLoop<()>, Window) {
     let event_loop: EventLoop<()> = EventLoop::new().expect("Failed to create event loop");

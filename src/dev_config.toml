@@ -1,0 +1,26 @@
+[display]
+width = 1920
+height = 1080
+
+[camera]
+fov = 80.0
+near = 0.1
+far = 1000.0
+
+[input]
+sensitivity = 0.4
+move_speed = 20.0
+
+[targets]
+color = [255, 255, 255] # R, G, B
+sphere_detail = 4
+
+[environment]
+light_direction = [0.5, 2.0, -1.5]
+scene_color = [255, 100, 100]
+
+[crosshair]
+color = 0xFF00FF00
+line_length = 2
+line_thickness = 1
+gap = -1
