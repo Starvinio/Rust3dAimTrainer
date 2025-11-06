@@ -22,41 +22,36 @@ Rust3dAimTrainer\
 ├───Cargo.lock
 ├───Cargo.toml
 ├───README.md
-├───.git\...
-├───src\
-│   ├───dev_config.toml
-│   ├───main.rs
-│   ├───todo.txt
-│   └───engine\
-│       ├───camera.rs
-│       ├───input.rs
-│       ├───mod.rs
-│       ├───runtime.rs
-│       ├───core\
-│       │   ├───config.rs
-│       │   ├───matrix.rs
-│       │   ├───mesh.rs
-│       │   ├───mod.rs
-│       │   ├───triangle.rs
-│       │   └───vector.rs
-│       ├───rendering\
-│       │   ├───clipping.rs
-│       │   ├───gui.rs
-│       │   ├───helpers.rs
-│       │   ├───mod.rs
-│       │   ├───projection.rs
-│       │   ├───rasterizer.rs
-│       │   └───window.rs
-│       └───scenario\
-│           ├───gun.rs
-│           ├───mod.rs
-│           ├───scenario.rs
-│           ├───scene.rs
-│           ├───stats.rs
-│           └───target.rs
-└───target\
-    ├───debug\...
-    ├───flycheck0\...
-    ├───release\...
-    └───rust-analyzer\...
+└───src\
+    ├───dev_config.toml
+    ├───main.rs
+    ├───todo.txt
+    └───engine\
+        ├───camera.rs
+        ├───input.rs
+        ├───mod.rs
+        ├───runtime.rs
+        ├───core\
+        │   ├───config.rs
+        │   ├───matrix.rs
+        │   ├───mesh.rs
+        │   ├───mod.rs
+        │   ├───triangle.rs
+        │   └───vector.rs
+        ├───rendering\
+        │   ├───clipping.rs
+        │   ├───gui.rs
+        │   ├───helpers.rs
+        │   ├───mod.rs
+        │   ├───projection.rs
+        │   ├───rasterizer.rs
+        │   └───window.rs
+        └───scenario\
+            ├───gun.rs
+            ├───mod.rs
+            ├───scenario.rs
+            ├───scene.rs
+            ├───stats.rs
+            └───target.rs
+    
 ```
