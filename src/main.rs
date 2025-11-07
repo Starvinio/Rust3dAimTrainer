@@ -3,12 +3,14 @@
 use std::{io,time::Duration};
 
 pub mod engine;
-
+use std::env;
 use crate::engine::core::{BLUE, RESET};
 use crate::engine::scenario::map_scenario;
 
 fn main() {
     engine::rendering::draw_logo();
+
+    env::set_var("RUST_BACKTRACE", "1");
 
     println!("Welcome to the Rust 3D Aim Trainer Demo Version!\n");
 

@@ -1,17 +1,21 @@
 use softbuffer::{Context, Surface};
-use rand::Rng;
 use std::{
     num::NonZeroU32,
     time::{Duration, Instant},
+    io::BufReader,
+    fs::File
+
 };
 use winit::{
     event::{DeviceEvent, ElementState, Event, MouseButton, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
 };
 use crate::engine::{
-    Statistic, Vec3d, camera::Camera, core::{CONFIG, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Gun, Scenario, add_target, create_room, create_target_vec}
+    Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Gun, Scenario, add_target, create_room, create_target_vec}
 
 };
+
+use rodio::{Decoder, Source};
 
 
 pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
@@ -36,12 +40,15 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
 
     let proj_matrix = Mat4x4::projection();
 
-    
-    let test_point = camera.position + camera.look_dir * 10.0;
-    let proj = proj_matrix.project_vec(camera.view_matrix * test_point);
-    
 
     let mut rng = rand::thread_rng();
+
+    let mut frame_count = 0;
+
+    // SFX setup
+    let stream_handle = rodio::OutputStreamBuilder::open_default_stream().unwrap();
+    let file = File::open(HIT_TARGET).unwrap();
+    let source = Decoder::new(BufReader::new(file)).unwrap().buffered();
 
 
     let mut pixel_buffer: Vec<u32> = vec![0; CONFIG.display.width * CONFIG.display.height];
@@ -88,6 +95,7 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
                 },
 
                 WindowEvent::RedrawRequested => {
+                    frame_count+=1;
                     let now = Instant::now();
                     let delta_time = now.duration_since(camera.last_frame_time).as_secs_f32();
                     
@@ -134,6 +142,9 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
                         let hit = target_proj_loop(target, &mut target_tri_vec, &camera,  gun_shot, &proj_matrix);
 
                         if hit {
+
+                            stream_handle.mixer().add(source.clone());
+
                             hit_target = true;
                             target.hp -= 1;
                             if target.hp < 1 {
@@ -221,4 +232,5 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
     print stats at the end 
 */  stats.end_scenario();
     stats.print_stats();
+    println!("{}", frame_count / stats.scenario_playtime());
 }

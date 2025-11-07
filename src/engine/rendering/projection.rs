@@ -1,5 +1,5 @@
 use crate::engine::{
-    camera::Camera, core::{CONFIG, Mat4x4, Mesh, TriToRaster, Triangle2d, Vec3d, }, gun, rendering::{ray_intersects_triangle, sigmoid, tri_clip_z}, scenario::Target
+    camera::Camera, core::{CONFIG, Mat4x4, Mesh, TriToRaster, Triangle2d, Vec3d, }, rendering::{ray_intersects_triangle, sigmoid, tri_clip_z}, scenario::Target
 };
 
 
@@ -41,13 +41,6 @@ pub fn target_proj_loop(target: &mut Target, tri_vec: &mut Vec<TriToRaster>, cam
         5. If a triangle passes behind the camera, it has to be clipped into smaller triangles that fit the screen, in order to
         prevent lagging and crashes. 
     */  let (clipped, n_clipped) = tri_clip_z(&mut tri_pre_clipping);
-
-
-    
-        //JUST FOR DEBUG
-        let color = if ray_intersects_triangle(&camera, &tri_world) {0xFF00FF} else {color};
-        
-
 
 
     /*
