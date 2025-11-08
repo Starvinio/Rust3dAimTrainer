@@ -1,5 +1,3 @@
-
-use std::time::Instant;
 use crate::engine::{RoomType, Vec3d, scenario::{MovingTarget, TargetType}};
 
 pub struct Scenario {
@@ -127,44 +125,82 @@ impl Scenario {
             target_hp: 1,
             moving_target: Some(
                 MovingTarget { 
-                    moving_room: (
+                    moving_bounds: (
                         Vec3d::new(4.0, 4.0, 4.0),
                         Vec3d::new(-4.0, -4.0, 4.0)
                     ), 
                     player_dist_r: 1.0, 
                     frequency: 0.3, 
-                    p_change_dir: 2.0, 
-                    vel_min_max: (2.0, 3.0), 
-                    last_dir_change_time: Instant::now()
+                    p_change_dir: 10.0, 
+                    vel_bounds: (
+                        Vec3d::new(2.0, 2.0, 0.0), 
+                        Vec3d::new(3.0, 3.0, 0.0)
+                    ), 
+                    interval_dir_change: 0.0,
                 }),
             allow_mouse_hold: false,
             allow_movement: false,
         }
     }
-    pub fn random_sphere() -> Self {
+    pub fn w_5t_pasu_small() -> Self {
+        Scenario {
+            player_spawn: Vec3d::new(0.0, 1.0, -4.0),
+            room_type: RoomType::Cube,
+            room_rad: 5.0,
+            target_type: TargetType::Sphere,
+            target_spawn: (
+                Vec3d::new(4.0, 4.0, 4.0),
+                Vec3d::new(-4.0, -4.0, 4.0)
+            ),
+            target_count: 5,
+            target_rad: 0.1,
+            target_hp: 1,
+            moving_target: Some(
+                MovingTarget { 
+                    moving_bounds: (
+                        Vec3d::new(4.0, 4.0, 4.0),
+                        Vec3d::new(-4.0, -4.0, 4.0)
+                    ), 
+                    player_dist_r: 1.0, 
+                    frequency: 0.3, 
+                    p_change_dir: 10.0, 
+                    vel_bounds: (
+                        Vec3d::new(2.0, 2.0, 0.0), 
+                        Vec3d::new(3.0, 3.0, 0.0)
+                    ), 
+                    interval_dir_change: 0.0,
+                }),
+            allow_mouse_hold: false,
+            allow_movement: false,
+        }
+    }
+    pub fn air_invincible() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, -4.0, 0.0),
             room_type: RoomType::Cube,
-            room_rad: 10.0,
+            room_rad: 5.0,
             target_type: TargetType::Sphere,
             target_spawn: (
-                Vec3d::new(0.0, 0.0, 9.0),
-                Vec3d::new(0.0, 0.0, 9.0)
+                Vec3d::new(0.0, 0.0, 5.0),
+                Vec3d::new(0.0, 0.0, 5.0)
             ),
             target_count: 1,
-            target_rad: 1.0,
-            target_hp: 1000,
+            target_rad: 0.8,
+            target_hp: 9999,
             moving_target: Some(
                 MovingTarget { 
-                    moving_room: (
-                        Vec3d::new(9.0, 0.0, 9.0),
-                        Vec3d::new(-9.0, -8.0, -9.0)
+                    moving_bounds: (
+                        Vec3d::new(4.0, 0.0, 4.0),
+                        Vec3d::new(-4.0, -4.0, -4.0)
                     ), 
-                    player_dist_r: 0.5, 
-                    frequency: 0.3, 
-                    p_change_dir: 0.5, 
-                    vel_min_max: (2.0, 8.0), 
-                    last_dir_change_time: Instant::now()
+                    player_dist_r: 1.0, 
+                    frequency: 0.2, 
+                    p_change_dir: 12.0, 
+                    vel_bounds: (
+                        Vec3d::new(3.0, 3.0, 3.0), 
+                        Vec3d::new(5.0, 5.0, 5.0)
+                    ), 
+                    interval_dir_change: 0.0,
                 }),
             allow_mouse_hold: true,
             allow_movement: false,
@@ -180,7 +216,8 @@ pub fn map_scenario(n: i8) -> Scenario {
         4 => Scenario::w_6t_small(),
         5 => Scenario::w_6t_extrasmall(),
         6 => Scenario::w_5t_pasu(),
-        99 => Scenario::random_sphere(),
+        7 => Scenario::w_5t_pasu_small(),
+        8 => Scenario::air_invincible(),
         _ => Scenario::w_6t_te()
     }
 }

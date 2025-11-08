@@ -11,7 +11,7 @@ use winit::{
     keyboard::{KeyCode, PhysicalKey},
 };
 use crate::engine::{
-    Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Gun, Scenario, add_target, create_room, create_target_vec}
+    POP, Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Gun, Scenario, add_target, create_room, create_target_vec}
 
 };
 
@@ -19,6 +19,7 @@ use rodio::{Decoder, Source};
 
 
 pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
+
     let (event_loop, window) = window::event_loop_setup();
 
     let context = Context::new(&window).unwrap();
@@ -30,7 +31,7 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
     let mut stats = Statistic::new();
 
     // need to make this save in scenario, no need for it here
-    let mut gun = Gun::new(0.2); // also magic num
+    let mut gun = Gun::new(0.05); // also magic num
 
     // maybe save this in scenario too
     let mut room = create_room(scenario.room_type, scenario.room_rad);
@@ -43,12 +44,17 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
 
     let mut rng = rand::thread_rng();
 
+    // Later divided by playtime
     let mut frame_count = 0;
 
     // SFX setup
     let stream_handle = rodio::OutputStreamBuilder::open_default_stream().unwrap();
-    let file = File::open(HIT_TARGET).unwrap();
-    let source = Decoder::new(BufReader::new(file)).unwrap().buffered();
+
+    let file_hit_target = File::open(HIT_TARGET).unwrap();
+    let src_hit_target = Decoder::new(BufReader::new(file_hit_target)).unwrap().buffered();
+
+    let file_pop = File::open(POP).unwrap();
+    let src_pop = Decoder::new(BufReader::new(file_pop)).unwrap().buffered();
 
 
     let mut pixel_buffer: Vec<u32> = vec![0; CONFIG.display.width * CONFIG.display.height];
@@ -137,13 +143,17 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
                     To avoid redundant looping, we handle both movement, rendering and hit detection in this loop 
                 */  for target in &mut target_vec {
 
-                        target.random_movement(camera.position, now, &mut rng, delta_time);
+                        target.random_movement(camera.position, &mut rng, delta_time);
 
                         let hit = target_proj_loop(target, &mut target_tri_vec, &camera,  gun_shot, &proj_matrix);
 
                         if hit {
 
-                            stream_handle.mixer().add(source.clone());
+                            if scenario.allow_mouse_hold {
+                                stream_handle.mixer().add(src_pop.clone());
+                            } else {
+                                stream_handle.mixer().add(src_hit_target.clone());
+                            }
 
                             hit_target = true;
                             target.hp -= 1;

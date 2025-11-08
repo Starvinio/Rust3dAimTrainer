@@ -5,10 +5,16 @@ use once_cell::sync::Lazy;
 use crate::engine::Crosshair;
 
 #[cfg(debug_assertions)]
-pub static HIT_TARGET: &str = "/src/engine/assets/sounds/hit_target.wav";
+pub static HIT_TARGET: &str = "src/engine/assets/sounds/hit_target.wav";
 
 #[cfg(not(debug_assertions))]
 pub static HIT_TARGET: &str = "hit_target.wav";
+
+#[cfg(debug_assertions)]
+pub static POP: &str = "src/engine/assets/sounds/pop_sound.mp3";
+
+#[cfg(not(debug_assertions))]
+pub static POP: &str = "pop_sound.mp3";
 
 #[cfg(debug_assertions)]
 pub static CONFIG_PATH: &str = "src/dev_config.toml";

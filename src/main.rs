@@ -25,7 +25,8 @@ fn main() {
     println!("[{}4{}] 1 Wall 6 Targets Small", BLUE, RESET);
     println!("[{}5{}] 1 Wall 6 Targets Extra Small", BLUE, RESET);
     println!("[{}6{}] 1 Wall 5 Targets Pasu", BLUE, RESET);
-    println!("[{}7{}] 1 Wall 1 Target Spheretrack", BLUE, RESET);
+    println!("[{}7{}] 1 Wall 5 Targets Pasu Small", BLUE, RESET);
+    println!("[{}8{}] 1 Wall 1 Target Spheretrack", BLUE, RESET);
 
     let mut scenario = 'scenario: loop {
         let mut input = String::new();

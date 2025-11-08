@@ -1,7 +1,5 @@
 
 use crate::engine::{CONFIG, Mat4x4, Scenario, Triangle, Vec3d, dyn_clamp_pos};
-use std::{ops::Sub, time::{Duration, Instant}};
-
 use rand::{Rng, rngs::ThreadRng};
 
 pub struct Target {
@@ -17,6 +15,21 @@ pub struct Target {
     pub moving: Option<MovingTarget>,
     pub position: Vec3d,
     pub velocity: Vec3d,
+}
+#[derive(Debug, Clone, Copy)]
+pub struct MovingTarget {
+
+    pub moving_bounds: (Vec3d, Vec3d), //  Cuboid space of movement, corners marked by vectors
+
+    pub player_dist_r: f32, //  Radius around the player that the target stays at
+
+    pub frequency: f32, //  How often should we generate a direction change
+
+    pub p_change_dir: f64, //  How likely is it to change direction upon a check?
+
+    pub vel_bounds: (Vec3d, Vec3d), //  How slow/fast does it move on each axis
+
+    pub interval_dir_change: f32, //  How long since last direction change
 }
 pub enum TargetType {
     Square,
@@ -52,16 +65,9 @@ impl Target {
             }
         }
 
-
-        let mut can_move:Option<MovingTarget> = None;
-        if let Some(moving_target) = moving {
-            moving_target.last_dir_change_time = Instant::sub(Instant::now(), Duration::from_secs_f32(moving_target.frequency));
-            can_move = Some(*moving_target)
-        } 
-
         Self {
             tris,
-            moving: can_move,
+            moving: *moving,
             radius,
             hp,
             position,
@@ -192,33 +198,31 @@ impl Target {
         }
     }
 
-    pub fn random_movement(&mut self, cam_pos:Vec3d, now:Instant, rng: &mut ThreadRng, delta_time:f32) {
+    pub fn random_movement(&mut self, cam_pos:Vec3d, rng: &mut ThreadRng, delta_time:f32) {
 
-        if let Some(ref mut moving_target) = self.moving {
-            if now
-                .duration_since(moving_target.last_dir_change_time)
-                .as_secs_f32()
-                >= moving_target.frequency * now
-                .duration_since(moving_target.last_dir_change_time)
-                .as_secs_f32()
-            {
+        if let Some(ref mut m) = self.moving {
+
+            let freq = m.frequency * rng.gen_range(0.5..1.5);
+            m.interval_dir_change += delta_time;
+
+            if m.interval_dir_change >= freq {
+
+                m.interval_dir_change = 0.0;
+
+                let min = m.vel_bounds.0; let max = m.vel_bounds.1;
             
             //  Generate a direction vector that can be either positive or negative (per axis)
-                let dir_vec = Vec3d::new(
-                    new_direction(moving_target, self.velocity.x, rng),
-                    new_direction(moving_target, self.velocity.y, rng),
-                    new_direction(moving_target, self.velocity.z, rng)
+                self.velocity = Vec3d::new(
+                    new_direction(m, self.velocity.x, rng, min.x, max.x),
+                    new_direction(m, self.velocity.y, rng, min.y, max.y),
+                    new_direction(m, self.velocity.z, rng, min.z, max.z)
                 );
-
-                self.velocity = dir_vec;
-
-                moving_target.last_dir_change_time = now;
             }
 
             let from_player = self.position - cam_pos;
             let dist = from_player.length();
 
-            if dist < moving_target.player_dist_r {
+            if dist < m.player_dist_r {
                 // Normalized direction *away* from player
                 let away_dir = from_player / dist;
 
@@ -238,20 +242,20 @@ impl Target {
             (self.position.x, self.velocity.x) = dyn_clamp_pos(
                 self.position.x, 
                 self.velocity.x,
-                moving_target.moving_room.0.x, 
-                moving_target.moving_room.1.x
+                m.moving_bounds.0.x, 
+                m.moving_bounds.1.x
             );
             (self.position.y, self.velocity.y) = dyn_clamp_pos(
                 self.position.y, 
                 self.velocity.y,
-                moving_target.moving_room.0.y, 
-                moving_target.moving_room.1.y
+                m.moving_bounds.0.y, 
+                m.moving_bounds.1.y
             );
             (self.position.z, self.velocity.z) = dyn_clamp_pos(
                 self.position.z, 
                 self.velocity.z,
-                moving_target.moving_room.0.z, 
-                moving_target.moving_room.1.z
+                m.moving_bounds.0.z, 
+                m.moving_bounds.1.z
             );
         }
     }
@@ -263,12 +267,11 @@ pub fn add_target(scenario:&mut Scenario, target_vec: &mut Vec<Target>, old_targ
     let mut target_start_vel = Vec3d::new(0.0, 0.0, 0.0);
 
     if let Some(ref mut m) = scenario.moving_target {
-        m.last_dir_change_time = Instant::now();
-        let min = m.vel_min_max.0; let max = m.vel_min_max.1;
+        let min = m.vel_bounds.0; 
         target_start_vel = Vec3d::new(
-            if rng.gen_bool(0.5) {-min} else {max},
-            if rng.gen_bool(0.5) {-min} else {max},
-            if rng.gen_bool(0.5) {-min} else {max},
+            if rng.gen_bool(0.5) {-min.x} else {min.x},
+            if rng.gen_bool(0.5) {-min.y} else {min.y},
+            if rng.gen_bool(0.5) {-min.z} else {min.z},
         );
     }
 
@@ -355,30 +358,20 @@ pub fn create_target_vec(scenario:&mut Scenario) -> (Vec<Target>, Option<Vec3d>)
     (target_vec, Option::None)
 }
 
-pub fn new_direction(moving_target: &mut MovingTarget, velo:f32, rng:&mut ThreadRng) -> f32 {
+pub fn new_direction(moving_target: &mut MovingTarget, velo:f32, rng:&mut ThreadRng, min:f32, max:f32) -> f32 {
     if velo > 0.0 {
         if rng.gen_bool(moving_target.p_change_dir / 100.0) {
-            -moving_target.vel_min_max.0
+            -min
         } else {
-            (velo + velo / 100.0).clamp(-moving_target.vel_min_max.1, moving_target.vel_min_max.1)
+            (velo + velo / 100.0).clamp(-max, max)
         }
     } else {
         if rng.gen_bool(moving_target.p_change_dir / 100.0) {
-            moving_target.vel_min_max.0
+            min
         } else {
-            (velo + velo / 100.0).clamp(-moving_target.vel_min_max.1, moving_target.vel_min_max.1)
+            (velo + velo / 100.0).clamp(-max, max)
         }
     }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct MovingTarget {
-    pub moving_room: (Vec3d, Vec3d),
-    pub player_dist_r: f32,
-    pub frequency: f32,
-    pub p_change_dir: f64,
-    pub vel_min_max: (f32,f32),
-    pub last_dir_change_time: Instant,
 }
 
 
