@@ -14,7 +14,6 @@ use crate::engine::{
     POP, Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Gun, Scenario, add_target, create_room, create_target_vec}
 
 };
-
 use rodio::{Decoder, Source};
 
 
