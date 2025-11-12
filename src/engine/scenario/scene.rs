@@ -92,7 +92,7 @@ fn octagon_room(rad: f32) -> Mesh {
 
 
 //  For sake of simplicity during creation, height will equal the radius
-    let height = rad;
+    let height = rad*2.0;
 
     let mut tris = Vec::new();
     let angle_step = std::f32::consts::PI / 4.0; // 8 sides

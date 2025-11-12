@@ -1,15 +1,14 @@
-use crate::engine::{RoomType, Vec3d, scenario::{MovingTarget, TargetType}};
+use crate::engine::{Gun, Mesh, RoomType, Vec3d, create_room, scenario::{MovingTarget, TargetType}};
 
 pub struct Scenario {
 
     //player
     pub player_spawn:Vec3d,
-    pub allow_mouse_hold: bool,
+    pub gun: Gun,
     pub allow_movement: bool,
 
     //room (centered around origin)
-    pub room_type: RoomType,
-    pub room_rad: f32,
+    pub room: Mesh,
 
     //target
     pub target_type: TargetType,
@@ -23,8 +22,7 @@ impl Scenario {
     fn jumbo_tf() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Square,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -34,15 +32,14 @@ impl Scenario {
             target_rad: 0.9, //0.9
             target_hp: 1,
             moving_target: None,
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: false,
         }
     }
     fn jumbo_flat() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Rectangle,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -52,15 +49,14 @@ impl Scenario {
             target_rad: 0.9,
             target_hp: 1,
             moving_target: None,
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: false,
         }
     }
     fn w_6t_te() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -70,15 +66,14 @@ impl Scenario {
             target_rad: 0.25,
             target_hp: 1,
             moving_target: None,
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: true,
         }
     }
     fn w_6t_small() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -88,15 +83,14 @@ impl Scenario {
             target_rad: 0.1,
             target_hp: 1,
             moving_target: None,
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: false,
         }
     }
     fn w_6t_extrasmall() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -106,15 +100,14 @@ impl Scenario {
             target_rad: 0.05,
             target_hp: 1,
             moving_target: None,
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: false,
         }
     }
     pub fn w_5t_pasu() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -138,15 +131,14 @@ impl Scenario {
                     ), 
                     interval_dir_change: 0.0,
                 }),
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: false,
         }
     }
     pub fn w_5t_pasu_small() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
             target_spawn: (
                 Vec3d::new(4.0, 4.0, 4.0),
@@ -170,15 +162,14 @@ impl Scenario {
                     ), 
                     interval_dir_change: 0.0,
                 }),
-            allow_mouse_hold: false,
+            gun: Gun::pistol(),
             allow_movement: false,
         }
     }
     pub fn air_invincible() -> Self {
         Scenario {
             player_spawn: Vec3d::new(0.0, -4.0, 0.0),
-            room_type: RoomType::Cube,
-            room_rad: 5.0,
+            room: create_room(RoomType::Octagon, 5.0),
             target_type: TargetType::Sphere,
             target_spawn: (
                 Vec3d::new(0.0, 0.0, 5.0),
@@ -202,7 +193,7 @@ impl Scenario {
                     ), 
                     interval_dir_change: 0.0,
                 }),
-            allow_mouse_hold: true,
+            gun: Gun::laser(),
             allow_movement: false,
         }
     }

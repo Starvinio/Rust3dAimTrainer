@@ -11,7 +11,13 @@ use winit::{
     keyboard::{KeyCode, PhysicalKey},
 };
 use crate::engine::{
-    POP, Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Gun, Scenario, add_target, create_room, create_target_vec}
+    POP, 
+    Statistic, 
+    camera::Camera, 
+    core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, 
+    input::InputState, 
+    rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, 
+    scenario::{Scenario, add_target, create_target_vec}
 
 };
 use rodio::{Decoder, Source};
@@ -29,14 +35,7 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
     let mut user_input = InputState::new();
     let mut stats = Statistic::new();
 
-    // need to make this save in scenario, no need for it here
-    let mut gun = Gun::new(0.05); // also magic num
-
-    // maybe save this in scenario too
-    let mut room = create_room(scenario.room_type, scenario.room_rad);
-
     let (mut target_vec, mut old_target) = create_target_vec(scenario);
-
 
     let proj_matrix = Mat4x4::projection();
 
@@ -121,7 +120,7 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
                     let mut target_tri_vec: Vec<TriToRaster> = Vec::new();
 
                     room_proj_loop(
-                        &mut room,
+                        &mut scenario.room,
                         &mut tri_vec,
                         &camera,
                         &proj_matrix,
@@ -131,9 +130,9 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
                     gun_shot should be set to true (depending on scenario config) upon mouse click or hold (only if gun can shoot).
                 */  let mut hit_target = false;
                     let mut gun_shot = false;
-                    if (!scenario.allow_mouse_hold && user_input.mouse_buttons_just_pressed.contains(&MouseButton::Left)) || 
-                    (scenario.allow_mouse_hold && user_input.mouse_buttons_pressed.contains(&MouseButton::Left) && gun.can_shoot()) {
-                        gun.shoot();
+                    if (!scenario.gun.automatic && user_input.mouse_buttons_just_pressed.contains(&MouseButton::Left)) || 
+                    (scenario.gun.automatic && user_input.mouse_buttons_pressed.contains(&MouseButton::Left) && scenario.gun.can_shoot()) {
+                        scenario.gun.shoot();
                         gun_shot = true;
                     }
 
@@ -148,7 +147,7 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
 
                         if hit {
 
-                            if scenario.allow_mouse_hold {
+                            if scenario.gun.automatic {
                                 stream_handle.mixer().add(src_pop.clone());
                             } else {
                                 stream_handle.mixer().add(src_hit_target.clone());
