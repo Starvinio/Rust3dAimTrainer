@@ -1,18 +1,16 @@
 use softbuffer::{Context, Surface};
 use std::{
     num::NonZeroU32,
-    time::{Duration, Instant},
+    time::{Instant},
     io::BufReader,
     fs::File
-
 };
 use winit::{
     event::{DeviceEvent, ElementState, Event, MouseButton, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
 };
 use crate::engine::{
-    POP, 
-    Statistic, 
+    POP, Statistic, 
     camera::Camera, 
     core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, 
     input::InputState, 
@@ -23,7 +21,7 @@ use crate::engine::{
 use rodio::{Decoder, Source};
 
 
-pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
+pub fn run(scenario: &mut Scenario) {
 
     let (event_loop, window) = window::event_loop_setup();
 
@@ -62,7 +60,7 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
         window_target.set_control_flow(winit::event_loop::ControlFlow::Poll);
 
         match stats.scenario_starttime.elapsed() {
-            Ok(elapsed) if elapsed > duration_secs => {
+            Ok(elapsed) if elapsed > scenario.duration_secs => {
                 window_target.exit();
             }
             _ => {}
@@ -204,7 +202,6 @@ pub fn run(scenario: &mut Scenario, duration_secs: Duration) {
                     } else if gun_shot {
                         stats.add_shot();
                     }
-
 
                     surface
                         .resize(

@@ -1,16 +1,21 @@
+use std::time::Duration;
+
 use crate::engine::{Gun, Mesh, RoomType, Vec3d, create_room, scenario::{MovingTarget, TargetType}};
 
 pub struct Scenario {
 
-    //player
+    //duration of the scenario run
+    pub duration_secs: Duration,
+
+    //player 
     pub player_spawn:Vec3d,
     pub gun: Gun,
     pub allow_movement: bool,
 
-    //room (centered around origin)
+    //room (centered around origin) 
     pub room: Mesh,
 
-    //target
+    //target properties
     pub target_type: TargetType,
     pub target_spawn: (Vec3d, Vec3d),
     pub target_count: i8,
@@ -21,6 +26,7 @@ pub struct Scenario {
 impl Scenario {
     fn jumbo_tf() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Square,
@@ -38,6 +44,7 @@ impl Scenario {
     }
     fn jumbo_flat() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Rectangle,
@@ -55,6 +62,7 @@ impl Scenario {
     }
     fn w_6t_te() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
@@ -72,6 +80,7 @@ impl Scenario {
     }
     fn w_6t_small() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
@@ -89,6 +98,7 @@ impl Scenario {
     }
     fn w_6t_extrasmall() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
@@ -106,6 +116,7 @@ impl Scenario {
     }
     pub fn w_5t_pasu() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
@@ -137,6 +148,7 @@ impl Scenario {
     }
     pub fn w_5t_pasu_small() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
@@ -168,6 +180,7 @@ impl Scenario {
     }
     pub fn air_invincible() -> Self {
         Scenario {
+            duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, -4.0, 0.0),
             room: create_room(RoomType::Octagon, 5.0),
             target_type: TargetType::Sphere,
@@ -197,6 +210,7 @@ impl Scenario {
             allow_movement: false,
         }
     }
+    
 }
 
 pub fn map_scenario(n: i8) -> Scenario {

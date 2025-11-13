@@ -1,7 +1,5 @@
 #![warn(unused_extern_crates)]
-
-use std::{io,time::Duration};
-
+use std::io;
 pub mod engine;
 use std::env;
 use crate::engine::core::{BLUE, RESET};
@@ -26,7 +24,7 @@ fn main() {
     println!("[{}5{}] 1 Wall 6 Targets Extra Small", BLUE, RESET);
     println!("[{}6{}] 1 Wall 5 Targets Pasu", BLUE, RESET);
     println!("[{}7{}] 1 Wall 5 Targets Pasu Small", BLUE, RESET);
-    println!("[{}8{}] 1 Wall 1 Target Spheretrack", BLUE, RESET);
+    println!("[{}8{}] Air Invincible", BLUE, RESET);
 
     let mut scenario = 'scenario: loop {
         let mut input = String::new();
@@ -43,5 +41,5 @@ fn main() {
         };
     };
 
-    engine::runtime::run(&mut scenario, Duration::from_secs(30));
+    engine::runtime::run(&mut scenario);
 }
