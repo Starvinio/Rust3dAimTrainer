@@ -1,7 +1,7 @@
 use crate::engine::{CONFIG, Triangle2d, TriToRaster};
 
 
-pub fn draw_triangle(buf: &mut [u32], tri: &Triangle2d) {
+pub fn draw_triangle(buf: &mut [u32], tri: &Triangle2d, width: usize, height: usize) {
     let color = 0xFF000000; // black
     draw_line(
         buf,
@@ -10,6 +10,8 @@ pub fn draw_triangle(buf: &mut [u32], tri: &Triangle2d) {
         tri.p[1].x as i32,
         tri.p[1].y as i32,
         color,
+        width,
+        height,
     );
     draw_line(
         buf,
@@ -18,6 +20,8 @@ pub fn draw_triangle(buf: &mut [u32], tri: &Triangle2d) {
         tri.p[2].x as i32,
         tri.p[2].y as i32,
         color,
+        width,
+        height,
     );
     draw_line(
         buf,
@@ -26,10 +30,12 @@ pub fn draw_triangle(buf: &mut [u32], tri: &Triangle2d) {
         tri.p[0].x as i32,
         tri.p[0].y as i32,
         color,
+        width,
+        height,
     );
 }
 
-fn draw_line(buf: &mut [u32], x0: i32, y0: i32, x1: i32, y1: i32, color: u32) {
+fn draw_line(buf: &mut [u32], x0: i32, y0: i32, x1: i32, y1: i32, color: u32, width: usize, height: usize) {
     let mut x0 = x0;
     let mut y0 = y0;
     let dx = (x1 - x0).abs();
@@ -39,7 +45,7 @@ fn draw_line(buf: &mut [u32], x0: i32, y0: i32, x1: i32, y1: i32, color: u32) {
     let mut err = dx + dy;
 
     loop {
-        put_pixel(buf, x0, y0, color);
+        put_pixel(buf, x0, y0, color, width, height);
         if x0 == x1 && y0 == y1 {
             break;
         }
@@ -64,6 +70,8 @@ fn fill_triangle_optimized(
     mut x2: i32,
     mut y2: i32,
     color: u32,
+    width: usize,
+    height: usize,
 ) {
     // Sort vertices by y-coordinate
     if y0 > y1 {
@@ -89,7 +97,7 @@ fn fill_triangle_optimized(
         if y < 0 {
             continue;
         }
-        if y >= CONFIG.display.height as i32 {
+        if y >= height as i32 {
             break;
         }
 
@@ -114,30 +122,30 @@ fn fill_triangle_optimized(
 
         // Clip to screen bounds
         minx = minx.max(0);
-        maxx = maxx.min(CONFIG.display.width as i32 - 1);
+        maxx = maxx.min(width as i32 - 1);
 
         if minx > maxx {
             continue;
         }
 
         // Use memset-like operation for horizontal spans
-        let row_start = (y as usize) * CONFIG.display.width + (minx as usize);
+        let row_start = (y as usize) * width + (minx as usize);
         let span_length = (maxx - minx + 1) as usize;
         buf[row_start..row_start + span_length].fill(color);
     }
 }
 
-pub fn put_pixel(buf: &mut [u32], x: i32, y: i32, color: u32) {
+pub fn put_pixel(buf: &mut [u32], x: i32, y: i32, color: u32, width: usize, height: usize) {
     if x >= 0
         && y >= 0
-        && (x as usize) < CONFIG.display.width
-        && (y as usize) < CONFIG.display.height
+        && (x as usize) < width
+        && (y as usize) < height
     {
-        buf[(y as usize) * CONFIG.display.width + (x as usize)] = color;
+        buf[(y as usize) * width + (x as usize)] = color;
     }
 }
 
-pub fn render_triangles(buffer: &mut [u32], list_triangles: &Vec<TriToRaster>) {
+pub fn render_triangles(buffer: &mut [u32], list_triangles: &Vec<TriToRaster>, width: usize, height: usize) {
     for tri in list_triangles.iter() {
         fill_triangle_optimized(
             buffer,
@@ -148,6 +156,8 @@ pub fn render_triangles(buffer: &mut [u32], list_triangles: &Vec<TriToRaster>) {
             tri.tri.p[2].x as i32,
             tri.tri.p[2].y as i32,
             tri.color,
+            width,
+            height,
         );
     }
 }

@@ -47,11 +47,10 @@ impl Mat4x4 {
     pub fn zero() -> Self {
         Self { m: [[0.0; 4]; 4] }
     }
-    pub fn projection() -> Self {
+    pub fn projection(width: f32, height:f32) -> Self {
         // Dynamically creates a projection matrix based on FOV, aspect ratio and far/near settings
         let fov_scale = 1.0 / (CONFIG.camera.fov * 0.5 * (PI / 180.0)).tan();
-        let display = &CONFIG.display;
-        let aspect = display.height as f32 / display.width as f32;
+        let aspect = height as f32 / width as f32;
         let near = CONFIG.camera.near; let far = CONFIG.camera.far;
         Self {
             m: ([

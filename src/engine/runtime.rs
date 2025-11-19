@@ -6,6 +6,7 @@ use std::{
     fs::File
 };
 use winit::{
+    dpi::PhysicalSize,
     event::{DeviceEvent, ElementState, Event, MouseButton, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
 };
@@ -35,7 +36,8 @@ pub fn run(scenario: &mut Scenario) {
 
     let (mut target_vec, mut old_target) = create_target_vec(scenario);
 
-    let proj_matrix = Mat4x4::projection();
+    let mut window_size = window.inner_size();
+    let mut proj_matrix = Mat4x4::projection(window_size.width as f32, window_size.height as f32);
 
 
     let mut rng = rand::thread_rng();
@@ -53,8 +55,7 @@ pub fn run(scenario: &mut Scenario) {
     let src_pop = Decoder::new(BufReader::new(file_pop)).unwrap().buffered();
 
 
-    let mut pixel_buffer: Vec<u32> = vec![0; CONFIG.display.width * CONFIG.display.height];
-    let window_size = window.inner_size();
+    let mut pixel_buffer: Vec<u32> = vec![0; window_size.width as usize * window_size.height as usize];
 
     let _ = event_loop.run(|event, window_target| {
         window_target.set_control_flow(winit::event_loop::ControlFlow::Poll);
@@ -68,6 +69,18 @@ pub fn run(scenario: &mut Scenario) {
         match event {
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::CloseRequested => window_target.exit(),
+
+                WindowEvent::Resized(new_size) => {
+                    window_size = new_size;
+                    proj_matrix = Mat4x4::projection(window_size.width as f32, window_size.height as f32);
+                    pixel_buffer.resize(window_size.width as usize * window_size.height as usize, 0);
+                    surface
+                        .resize(
+                            NonZeroU32::new(window_size.width).unwrap(),
+                            NonZeroU32::new(window_size.height).unwrap(),
+                        )
+                        .unwrap();
+                }
 
                 WindowEvent::KeyboardInput {
                     event: key_event, ..
@@ -181,12 +194,12 @@ pub fn run(scenario: &mut Scenario) {
                     for tri2d in &mut tri_vec {
                         tri_clipped.clear();
                         tri_clip_xy(tri2d, &mut tri_clipped);
-                        render_triangles(&mut pixel_buffer, &tri_clipped);
+                        render_triangles(&mut pixel_buffer, &tri_clipped, window_size.width as usize, window_size.height as usize);
                     }
 
                 /*
                     Crosshair is drawn based on users settings in config.toml
-                */  draw_crosshair(&mut pixel_buffer, CONFIG.crosshair);
+                */  draw_crosshair(&mut pixel_buffer, CONFIG.crosshair, window_size.width as usize, window_size.height as usize);
 
                 /*
                     Remove Targets with an hp <= 0 and spawn in a new one to keep the target count consistent
@@ -203,12 +216,6 @@ pub fn run(scenario: &mut Scenario) {
                         stats.add_shot();
                     }
 
-                    surface
-                        .resize(
-                            NonZeroU32::new(window_size.width).unwrap(),
-                            NonZeroU32::new(window_size.height).unwrap(),
-                        )
-                        .unwrap();
                     let mut buffer = surface.buffer_mut().unwrap();
                     buffer.copy_from_slice(&pixel_buffer);
                     buffer.present().unwrap();
