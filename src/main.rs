@@ -1,39 +1,32 @@
-#![warn(unused_extern_crates)]
 use std::io;
 pub mod engine;
 use std::env;
 use crate::engine::core::{BLUE, RESET};
-use crate::engine::scenario::map_scenario;
+use crate::engine::{load_scenarios};
+fn main() -> Result<(),engine::core::error::SetupError>
+{
 
-fn main() {
     engine::rendering::draw_logo();
 
     env::set_var("RUST_BACKTRACE", "1");
 
-    println!("Welcome to the Rust 3D Aim Trainer Demo Version!\n");
+    let mut scenarios = load_scenarios();
 
-    println!(
-        "Each run will last 30 seconds\nPress {}ESC{} to exit\n",
-        BLUE, RESET
-    );
-    println!("Please select a {}scenario{}:", BLUE, RESET);
-    println!("[{}1{}] Jumbo Tile Frenzy", BLUE, RESET);
-    println!("[{}2{}] Jumbo Tile Frenzy Flat", BLUE, RESET);
-    println!("[{}3{}] 1 Wall 6 Targets TE", BLUE, RESET);
-    println!("[{}4{}] 1 Wall 6 Targets Small", BLUE, RESET);
-    println!("[{}5{}] 1 Wall 6 Targets Extra Small", BLUE, RESET);
-    println!("[{}6{}] 1 Wall 5 Targets Pasu", BLUE, RESET);
-    println!("[{}7{}] 1 Wall 5 Targets Pasu Small", BLUE, RESET);
-    println!("[{}8{}] Air Invincible", BLUE, RESET);
+    println!("Welcome to the Rust 3D Aim Trainer!\n");
 
-    let mut scenario = 'scenario: loop {
+    for (i,scenario) in scenarios.iter().enumerate() {
+        println!("[{}{}{}] {}", BLUE, i, RESET, scenario.name);
+    }
+    println!("Please select a {}scenario{} by entering a number:", BLUE, RESET);
+
+    let scenario_index = 'scenario: loop {
         let mut input = String::new();
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read line");
 
-        match input.trim().parse::<i8>() {
-            Ok(num) => break map_scenario(num),
+        match input.trim().parse::<usize>() {
+            Ok(num) => break num,
             Err(_) => {
                 println!("Invalid input. Please enter a number.");
                 continue 'scenario;
@@ -41,5 +34,5 @@ fn main() {
         };
     };
 
-    engine::runtime::run(&mut scenario);
+    engine::runtime::run(&mut scenarios[scenario_index])
 }

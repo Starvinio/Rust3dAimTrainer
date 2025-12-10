@@ -1,4 +1,4 @@
-use crate::engine::{CONFIG, Triangle2d, TriToRaster};
+use crate::engine::{Triangle2d, TriToRaster};
 
 
 pub fn draw_triangle(buf: &mut [u32], tri: &Triangle2d, width: usize, height: usize) {
@@ -61,6 +61,7 @@ fn draw_line(buf: &mut [u32], x0: i32, y0: i32, x1: i32, y1: i32, color: u32, wi
     }
 }
 
+#[inline(always)]
 fn fill_triangle_optimized(
     buf: &mut [u32],
     mut x0: i32,
@@ -135,6 +136,7 @@ fn fill_triangle_optimized(
     }
 }
 
+#[inline(always)]
 pub fn put_pixel(buf: &mut [u32], x: i32, y: i32, color: u32, width: usize, height: usize) {
     if x >= 0
         && y >= 0

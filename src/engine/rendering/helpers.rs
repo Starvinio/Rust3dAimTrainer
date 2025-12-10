@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs;
 use std::io::{BufRead, BufReader};
 
 use std::f32::consts::PI;
@@ -25,7 +25,7 @@ pub fn sigmoid(x: f32) -> f32 {
 }
 
 pub fn load_from_obj(path: &str) -> Result<Mesh, std::io::Error> {
-    let file = File::open(path)?;
+    let file = fs::File::open(path)?;
     let reader = BufReader::new(file);
     let mut verts: Vec<Vec3d> = Vec::new();
     let mut tris: Vec<Triangle> = Vec::new();
@@ -132,21 +132,8 @@ pub fn dyn_clamp_pos(pos:f32, vel:f32, n1:f32, n2:f32) -> (f32,f32) {
             return (n1, vel);
         }
         (pos, vel)
-
-    /* 
-            let half_moving_d = moving_target.moving_d / 2.0;
-            if self.position.x.abs() > half_moving_d {
-                self.velocity.x *= -1.0;
-                self.position.x =
-                    self.position.x.clamp(-half_moving_d, half_moving_d);
-            }
-            if self.position.y.abs() > half_moving_d {
-                self.velocity.y *= -1.0;
-                self.position.y =
-                    self.position.y.clamp(-half_moving_d, half_moving_d);
-            }
-            */
 }
+
 
 
 pub fn draw_logo() {

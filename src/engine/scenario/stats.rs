@@ -38,12 +38,14 @@ impl Statistic {
     pub fn scenario_playtime(&self) -> i32 {
         self.scenario_endtime.duration_since(self.scenario_starttime).unwrap().as_secs() as i32
     }
-    pub fn print_stats(&mut self) {
-        println!("\n{}----- RESULTS ----- {}", BLUE, RESET);
+    pub fn print_stats(&mut self, scenario_name:&String) {
+        println!("\n{}--- RESULTS --- {}", BLUE, RESET);
+        println!("\n{}{}{}", BLUE, scenario_name.to_uppercase(), RESET);
         println!("Duration: {} seconds", self.scenario_playtime());
         println!("Hits: {}", self.hits);
         println!("Shots: {}", self.shots);
         println!("Accuracy: {:.2}%", self.get_accuracy_p());
-        println!("{}----- END RESULTS ----- {}\n", BLUE, RESET);
+        println!("\n{}--- END RESULTS --- {}\n", BLUE, RESET);
+        println!("Rerun executable to play again.\n");
     }
 }

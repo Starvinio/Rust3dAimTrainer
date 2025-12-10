@@ -18,7 +18,7 @@ impl Camera {
         let up = Vec3d {x: 0.0, y: 1.0, z: 0.0};
         Self {
             position:pos,
-            look_dir:look_dir,
+            look_dir,
             view_matrix: Mat4x4::point_at(&pos, &(pos + look_dir), &up).quickinverse(),
             yaw:0.0,
             pitch:0.0,

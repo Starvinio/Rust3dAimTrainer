@@ -1,29 +1,37 @@
 use serde::Deserialize;
 use std::fs;
 use once_cell::sync::Lazy;
+use std::path::{Path, PathBuf};
+use std::env;
 
 use crate::engine::Crosshair;
 
-#[cfg(debug_assertions)]
-pub static HIT_TARGET: &str = "src/engine/assets/sounds/hit_target.wav";
+fn asset_path(relative_path: &str) -> PathBuf {
+    let base = if cfg!(debug_assertions) {
+        // In debug builds, assets are relative to the project root.
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    } else {
+        // In release builds, assets are relative to the executable.
+        let mut path = env::current_exe().expect("Failed to get current executable path.");
+        path.pop(); // Get directory of executable
+        path
+    };
+    base.join(relative_path)
+}
 
-#[cfg(not(debug_assertions))]
-pub static HIT_TARGET: &str = "hit_target.wav";
+const HIT_TARGET_REL: &str = if cfg!(debug_assertions) { "src/assets/sounds/hit_target.wav" } else { "assets/sounds/hit_target.wav" };
+const POP_REL: &str = if cfg!(debug_assertions) { "src/assets/sounds/pop_sound.mp3" } else { "assets/sounds/pop_sound.mp3" };
+const CONFIG_PATH_REL: &str = if cfg!(debug_assertions) { "src/config.toml" } else { "config.toml" };
+const GUI_TXT_PATH_REL: &str = if cfg!(debug_assertions) { "src/assets/gui/gui.png" } else { "assets/gui/gui.png" };
 
-#[cfg(debug_assertions)]
-pub static POP: &str = "src/engine/assets/sounds/pop_sound.mp3";
+pub static HIT_TARGET: Lazy<PathBuf> = Lazy::new(|| asset_path(HIT_TARGET_REL));
+pub static POP: Lazy<PathBuf> = Lazy::new(|| asset_path(POP_REL));
+pub static CONFIG_PATH: Lazy<PathBuf> = Lazy::new(|| asset_path(CONFIG_PATH_REL));
+pub static GUI_TXT_PATH: Lazy<PathBuf> = Lazy::new(|| asset_path(GUI_TXT_PATH_REL));
 
-#[cfg(not(debug_assertions))]
-pub static POP: &str = "pop_sound.mp3";
-
-#[cfg(debug_assertions)]
-pub static CONFIG_PATH: &str = "src/dev_config.toml";
-
-#[cfg(not(debug_assertions))]
-pub static CONFIG_PATH: &str = "config.toml";
 
 // Lazily load config at runtime, only once
-pub static CONFIG: Lazy<Config> = Lazy::new(|| load_config(CONFIG_PATH));
+pub static CONFIG: Lazy<Config> = Lazy::new(|| load_config(&CONFIG_PATH));
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -70,8 +78,8 @@ pub struct Environment {
 pub const BLUE: &str = "\x1b[94m";
 pub const RESET: &str = "\x1b[0m";
 
-pub fn load_config(path: &str) -> Config {
-    let config_str = fs::read_to_string(path).expect("Failed to read config.toml");
+pub fn load_config(path: &Path) -> Config {
+    let config_str = fs::read_to_string(path).unwrap_or_else(|e| panic!("Failed to read config file at {:?}: {}", path, e));
 
     toml::from_str::<Config>(&config_str).expect("Failed to parse config.toml")
 }

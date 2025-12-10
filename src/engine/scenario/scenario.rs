@@ -4,6 +4,8 @@ use crate::engine::{Gun, Mesh, RoomType, Vec3d, create_room, scenario::{MovingTa
 
 pub struct Scenario {
 
+    pub name: String,
+
     //duration of the scenario run
     pub duration_secs: Duration,
 
@@ -26,6 +28,7 @@ pub struct Scenario {
 impl Scenario {
     fn jumbo_tf() -> Self {
         Scenario {
+            name: String::from("Jumbo Tile Frenzy"),
             duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
@@ -44,6 +47,7 @@ impl Scenario {
     }
     fn jumbo_flat() -> Self {
         Scenario {
+            name: String::from("Jumbo Tile Frenzy Flat"),
             duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
@@ -62,6 +66,7 @@ impl Scenario {
     }
     fn w_6t_te() -> Self {
         Scenario {
+            name: String::from("1 Wall 6 Targets TE"),
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
@@ -75,11 +80,12 @@ impl Scenario {
             target_hp: 1,
             moving_target: None,
             gun: Gun::pistol(),
-            allow_movement: true,
+            allow_movement: false,
         }
     }
     fn w_6t_small() -> Self {
         Scenario {
+            name: String::from("1 Wall 6 Targets small"),
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
@@ -98,6 +104,7 @@ impl Scenario {
     }
     fn w_6t_extrasmall() -> Self {
         Scenario {
+            name: String::from("1 Wall 6 Targets extra small"),
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
@@ -116,7 +123,8 @@ impl Scenario {
     }
     pub fn w_5t_pasu() -> Self {
         Scenario {
-            duration_secs: Duration::from_secs(60),
+            name: String::from("1 Wall 5 Targets Pasu"),
+            duration_secs: Duration::from_secs(90),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             target_type: TargetType::Sphere,
@@ -148,6 +156,7 @@ impl Scenario {
     }
     pub fn w_5t_pasu_small() -> Self {
         Scenario {
+            name: String::from("1 Wall 5 Targets Pasu Small"),
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
@@ -180,6 +189,7 @@ impl Scenario {
     }
     pub fn air_invincible() -> Self {
         Scenario {
+            name: String::from("Air Invincible"),
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, -4.0, 0.0),
             room: create_room(RoomType::Octagon, 5.0),
@@ -213,16 +223,15 @@ impl Scenario {
     
 }
 
-pub fn map_scenario(n: i8) -> Scenario {
-    match n {
-        1 => Scenario::jumbo_tf(),
-        2 => Scenario::jumbo_flat(),
-        3 => Scenario::w_6t_te(),
-        4 => Scenario::w_6t_small(),
-        5 => Scenario::w_6t_extrasmall(),
-        6 => Scenario::w_5t_pasu(),
-        7 => Scenario::w_5t_pasu_small(),
-        8 => Scenario::air_invincible(),
-        _ => Scenario::w_6t_te()
-    }
+pub fn load_scenarios() -> Vec<Scenario> {
+    vec![
+        Scenario::jumbo_tf(),
+        Scenario::jumbo_flat(),
+        Scenario::w_6t_te(),
+        Scenario::w_6t_small(),
+        Scenario::w_6t_extrasmall(),
+        Scenario::w_5t_pasu(),
+        Scenario::w_5t_pasu_small(),
+        Scenario::air_invincible(),
+    ]
 }
