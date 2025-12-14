@@ -14,5 +14,6 @@ rodio = "0.21.1"
 thiserror = "2.0.17"
 png = "0.18.0"
 supports-color = "3.0.2"
+mem = "0.5.0"
 
 

@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use crate::engine::{Gun, Mesh, RoomType, Vec3d, create_room, scenario::{MovingTarget, TargetType}};
+use crate::engine::color::Colors;
 
 pub struct Scenario {
 
@@ -554,16 +555,13 @@ impl Scenario {
 
 pub fn load_all_scenarios() -> Vec<Scenario> {
     let mut all_scenarios: Vec<Scenario> = Vec::new();
-    
     all_scenarios.append(&mut static_clicking());
     all_scenarios.append(&mut dyn_clicking());
     all_scenarios.append(&mut reactive_tracking());
     all_scenarios.append(&mut precise_tracking());
     all_scenarios.append(&mut speed_switching());
     all_scenarios.append(&mut evasive_switching());
-    
     all_scenarios
-    
 }
 
 pub fn static_clicking() -> Vec<Scenario> {
@@ -613,6 +611,38 @@ pub fn evasive_switching() -> Vec<Scenario> {
     vec![
         Scenario::control_ts(),
     ]
+}
+
+pub fn get_scenarios(i: usize, colors: &Colors) -> Vec<Scenario> {
+    match i {
+        1 => {
+            println!("\n{}STATIC CLICKING{}", colors.blue, colors.reset);
+            static_clicking()
+        },
+        2 => {
+            println!("\n{}DYNAMIC CLICKING{}", colors.blue, colors.reset);
+            dyn_clicking()
+        },
+        3 => {
+            println!("\n{}REACTIVE TRACKING{}", colors.blue, colors.reset);
+            reactive_tracking()
+        },
+        4 => {
+            println!("\n{}PRECISE CLICKING{}", colors.blue, colors.reset);
+            precise_tracking()
+        },
+        5 => {
+            println!("\n{}SPEED SWITCHING{}", colors.blue, colors.reset);
+            speed_switching()
+        },
+        6 => {
+            println!("\n{}STATIC CLICKING{}", colors.blue, colors.reset);
+            evasive_switching()
+        },
+        0 | _ => {
+            println!("\n{}ALL SCENARIOS{}", colors.blue, colors.reset);
+            load_all_scenarios()},
+    }
 }
 
 

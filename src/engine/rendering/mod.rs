@@ -4,7 +4,7 @@ pub mod clipping;
 pub mod window;
 pub mod rasterizer;
 pub mod gui;
-pub mod print;
+pub mod cli;
 pub mod color;
 
 pub use helpers::*;

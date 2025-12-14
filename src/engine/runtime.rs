@@ -9,14 +9,14 @@ use winit::{
     event::{DeviceEvent, ElementState, Event, MouseButton, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
 };
-use crate::engine::{POP, Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Scenario, add_target, create_target_vec}, draw_texture_optimized, GUI, GUI_TXT_PATH, EngineError};
+use crate::engine::{Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Scenario, add_target, create_target_vec}, draw_texture_optimized, GUI, GUI_TXT_PATH, EngineError};
 use rodio::{Decoder, Source};
-
+use winit::window::Fullscreen;
+use crate::engine::cli::play_again;
 
 pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
 
     let (event_loop, window) = window::event_loop_setup()?;
-    
     // Initialize softbuffer
     let context = Context::new(&window)?;
     let mut surface = Surface::new(&context, &window)?;
@@ -40,7 +40,7 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let mut rng = rand::thread_rng();
 
     // Later divided by playtime
-    let mut total_frame_count = 0;
+    let mut total_frame_count: u32 = 0;
 
     let mut fps_str = String::from("0");
     let mut interval_frame_count = 0;
@@ -49,13 +49,11 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let (mut minutes, mut seconds) = (0, 0);
 
     // SFX setup
-    let stream_handle = rodio::OutputStreamBuilder::open_default_stream()?;
+    let mut stream_handle = rodio::OutputStreamBuilder::open_default_stream()?;
+    rodio::OutputStream::log_on_drop(&mut stream_handle, false);
 
     let file_hit_target = File::open(&*HIT_TARGET).unwrap();
     let src_hit_target = Decoder::new(BufReader::new(file_hit_target)).unwrap().buffered();
-
-    let file_pop = File::open(&*POP).unwrap();
-    let src_pop = Decoder::new(BufReader::new(file_pop)).unwrap().buffered();
 
     // Texture setup
     let gui = GUI::load_gui(GUI_TXT_PATH.to_str().unwrap());
@@ -68,8 +66,24 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
         match stats.scenario_starttime.elapsed() {
             Ok(elapsed) => {
                 if elapsed > scenario.duration_secs {
-                    window_target.exit();
-                    return;
+                    // Hide window and prompt for replay
+                    window.set_fullscreen(None);
+                    window.set_minimized(true);
+                    stats.end_scenario();
+                    stats.print_stats(&scenario.name, total_frame_count / stats.scenario_playtime());
+
+                    if play_again() {
+                        stats = Statistic::new();
+                        camera = Camera::new(scenario.player_spawn);
+                        (target_vec, old_target) = create_target_vec(scenario);
+                        total_frame_count = 0;
+                        window.set_minimized(false);
+                        window.set_fullscreen(Some(Fullscreen::Borderless(None)));
+                        window.focus_window();
+                    } else {
+                        window_target.exit();
+                        return;
+                    }
                 } else {
                     // This is used for timer display
                     seconds = (scenario.duration_secs - elapsed).as_secs() + 1;
@@ -103,7 +117,33 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                         match key_event.state {
                             ElementState::Pressed => {
                                 if keycode == KeyCode::Escape {
-                                    window_target.exit();
+                                    window.set_fullscreen(None);
+                                    window.set_minimized(true);
+                                    /*
+                                    end scenario to be able to display total time played
+                                    print stats at the end
+                                */  stats.end_scenario();
+                                    stats.print_stats(&scenario.name, total_frame_count / stats.scenario_playtime());
+
+                                    if play_again() {
+                                        stats = Statistic::new();
+                                        camera = Camera::new(scenario.player_spawn);
+                                        (target_vec, old_target) = create_target_vec(scenario);
+                                        total_frame_count = 00;
+                                        window.set_minimized(false);
+                                        window.set_fullscreen(Some(Fullscreen::Borderless(None)));
+                                        window.focus_window();
+                                    } else {
+                                        window_target.exit();
+                                        return;
+                                    }
+                                }
+                                if keycode == KeyCode::KeyR {
+                                    stats = Statistic::new();
+                                    camera = Camera::new(scenario.player_spawn);
+                                    (target_vec, old_target) = create_target_vec(scenario);
+                                    total_frame_count = 0;
+
                                 }
                                 user_input.pressed_key(keycode);
                             }
@@ -301,11 +341,6 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
         };
     });
 
-/*  end scenario to be able to display total time played
-    print stats at the end 
-*/  stats.end_scenario();
-    stats.print_stats(&scenario.name);
-    println!("AVG FPS: {}", total_frame_count / stats.scenario_playtime());
-    
+
     Ok(())
 }

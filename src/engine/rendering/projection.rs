@@ -30,7 +30,7 @@ pub fn target_proj_loop(target: &mut Target, tri_vec: &mut Vec<TriToRaster>, cam
 
     /*
         3. Apply colorized shading utilizing the normal of the triangle
-    */  let mut color = color_triangle(normal, CONFIG.targets.color);
+    */  let color = color_triangle(normal, CONFIG.targets.color);
 
 
     /* 

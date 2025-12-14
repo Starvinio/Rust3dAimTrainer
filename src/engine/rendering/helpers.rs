@@ -4,7 +4,7 @@ use std::io::{BufRead, BufReader};
 use std::f32::consts::PI;
 
 use crate::engine::camera::{Camera};
-use crate::engine::core::{BLUE, CONFIG, Mesh, RESET, Triangle, Vec3d};
+use crate::engine::core::{CONFIG, Mesh, Triangle, Vec3d};
 
 /*  This turns the view cone specified as FOV into a scaling factor for
 projection, which will make sure that, as the FOV increases, the
