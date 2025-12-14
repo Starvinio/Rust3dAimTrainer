@@ -22,5 +22,5 @@ scene_color = [55, 55, 55]
 [crosshair]
 color = 0xFF00FF00
 line_length = 3
-line_thickness = 2
-gap = 0
+line_thickness = 1
+gap = -1

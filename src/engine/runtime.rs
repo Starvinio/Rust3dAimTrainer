@@ -9,11 +9,11 @@ use winit::{
     event::{DeviceEvent, ElementState, Event, MouseButton, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
 };
-use crate::engine::{POP, Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Scenario, add_target, create_target_vec}, SetupError, draw_texture_optimized, GUI, GUI_TXT_PATH};
+use crate::engine::{POP, Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Scenario, add_target, create_target_vec}, draw_texture_optimized, GUI, GUI_TXT_PATH, EngineError};
 use rodio::{Decoder, Source};
 
 
-pub fn run(scenario: &mut Scenario) -> Result<(), SetupError>{
+pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
 
     let (event_loop, window) = window::event_loop_setup()?;
     
@@ -174,7 +174,7 @@ pub fn run(scenario: &mut Scenario) -> Result<(), SetupError>{
                         if hit {
 
                             if scenario.gun.automatic {
-                                stream_handle.mixer().add(src_pop.clone());
+                                stream_handle.mixer().add(src_hit_target.clone());
                             } else {
                                 stream_handle.mixer().add(src_hit_target.clone());
                             }

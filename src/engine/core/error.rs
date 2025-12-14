@@ -1,8 +1,7 @@
-use thiserror::Error;
 
 
-#[derive(Error, Debug)]
-pub enum SetupError {
+#[derive(thiserror::Error, Debug)]
+pub enum EngineError {
     #[error("Failed to create event loop: {0}")]
     EventLoop(#[from] winit::error::EventLoopError),
 
@@ -15,6 +14,6 @@ pub enum SetupError {
     #[error("Failed to create audio stream: {0}")]
     Stream(#[from] rodio::stream::StreamError),
 
-
-
+    #[error("ANSI compatibility check failed. Please run in a terminal.")]
+    ColorCheck
 }

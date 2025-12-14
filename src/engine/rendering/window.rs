@@ -4,16 +4,15 @@ use winit::window::CursorGrabMode;
 use winit::window::Fullscreen;
 use winit::window::{Window, WindowBuilder};
 
-use crate::engine::{CONFIG, SetupError};
+use crate::engine::{CONFIG, EngineError};
 
 
-pub fn event_loop_setup() -> Result<(EventLoop<()>, Window), SetupError> {
+pub fn event_loop_setup() -> Result<(EventLoop<()>, Window), EngineError> {
 
     let event_loop= EventLoop::new()?;
     
     let window = WindowBuilder::new()
-        .with_title("3d Engine")
-        //.with_position(LogicalPosition::new(-8, 0))
+        .with_title("Rust3dAimTrainer")
         .with_inner_size(PhysicalSize::new(
             CONFIG.display.width as u32,
             CONFIG.display.height as u32,

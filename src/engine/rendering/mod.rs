@@ -4,6 +4,8 @@ pub mod clipping;
 pub mod window;
 pub mod rasterizer;
 pub mod gui;
+pub mod print;
+pub mod color;
 
 pub use helpers::*;
 pub use projection::*;

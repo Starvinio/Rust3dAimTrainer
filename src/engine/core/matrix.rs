@@ -53,7 +53,7 @@ impl Mat4x4 {
         let aspect = height as f32 / width as f32;
         let near = CONFIG.camera.near; let far = CONFIG.camera.far;
         Self {
-            m: ([
+            m: [
                 [fov_scale * aspect,    0.0,                            0.0,                  0.0],
 
                 [0.0,                   fov_scale,                      0.0,                  0.0],
@@ -61,7 +61,7 @@ impl Mat4x4 {
                 [0.0,                   0.010001,                       far / (far - near),   1.0],
                 
                 [0.0,                   (-far * near) / (far - near),   0.0,                  0.0],
-            ]),
+            ],
         }
     }
     pub fn x_rotation(theta:f32) -> Self {

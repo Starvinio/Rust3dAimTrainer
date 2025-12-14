@@ -11,12 +11,12 @@ pub fn target_proj_loop(target: &mut Target, tri_vec: &mut Vec<TriToRaster>, cam
 */
     let mut hit = false;
 
-    //It utiziles the following procedure on each loop iteration:
+    //It utilizes the following procedure on each loop iteration:
     for tri in &mut target.tris {
 
     /*
         1. transform the triangles' position (in case of movement) 
-        [we do this because its faster than separately looping through each triangle again]
+        [we do this because it's faster than separately looping through each triangle again]
     */  let tri_world = *tri + target.position;
         
 
@@ -30,7 +30,8 @@ pub fn target_proj_loop(target: &mut Target, tri_vec: &mut Vec<TriToRaster>, cam
 
     /*
         3. Apply colorized shading utilizing the normal of the triangle
-    */  let color = color_triangle(normal, CONFIG.targets.color);
+    */  let mut color = color_triangle(normal, CONFIG.targets.color);
+
 
     /* 
         4. Convert Triangles' World Space to View Space by multiplying with camera's view matrix.
@@ -63,7 +64,7 @@ pub fn target_proj_loop(target: &mut Target, tri_vec: &mut Vec<TriToRaster>, cam
             
         }
     /*
-        7. If the player shot the gun while hovering over the any of the targets' triangles with their crosshair, they hit the target, 
+        7. If the player shot the gun while hovering over any of the targets' triangles with their crosshair, they hit the target,
         which is why we then return true.
     */  if gun_shot && !hit && ray_intersects_triangle(&camera, &tri_world) {
             hit = true;
