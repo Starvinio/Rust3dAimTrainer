@@ -13,7 +13,7 @@ pub fn print_logo(colors: &Colors) {
 
 
 "#;
-    println!("{}{}{}Welcome to the Rust 3D Aim Trainer!{}", colors.red, logo, colors.blue, colors.reset);
+    println!("{}{}{}Welcome to the Rust 3D Aim Trainer!{}\n", colors.red, logo, colors.blue, colors.reset);
 }
 
 pub fn print_cli_select(n:usize, message:&str, colors: &Colors) {
@@ -21,7 +21,7 @@ pub fn print_cli_select(n:usize, message:&str, colors: &Colors) {
 }
 
 pub fn print_categories(colors: &Colors) {
-    print_cli_select(0, "List all Scenarios", &colors);
+    print_cli_select(0, "List all Scenarios\n", &colors);
     println!("{}AIMING TYPE CATEGORIES:{}", colors.blue, colors.reset);
     print_cli_select(1, "Static Clicking", &colors);
     print_cli_select(2, "Dynamic Clicking", &colors);
@@ -42,7 +42,8 @@ pub fn print_categories(colors: &Colors) {
     }
 }
 
-pub fn get_list_type() -> usize {
+pub fn get_category(colors: &Colors) -> usize {
+    print_categories(colors);
     'listType: loop {
         let mut input = String::new();
         io::stdin()
@@ -102,12 +103,9 @@ pub fn get_scenario_index(len: usize, colors: &Colors) -> usize {
 pub fn play_again() -> bool {
     print!("Play again? (y/N): ");
     match io::stdout().flush() {
-        Err(_) => {
-            println!("Play again? (y/N): ");
-        },
+        Err(_) => { println!("Play again? (y/N): "); },
         _ => {}
     }
-
     let mut input = String::new();
         io::stdin()
             .read_line(&mut input)

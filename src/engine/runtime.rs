@@ -47,6 +47,7 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let mut last_fps_display = Instant::now();
 
     let (mut minutes, mut seconds) = (0, 0);
+    let mut scenario_ended = false;
 
     // SFX setup
     let mut stream_handle = rodio::OutputStreamBuilder::open_default_stream()?;
@@ -65,15 +66,17 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
 
         match stats.scenario_starttime.elapsed() {
             Ok(elapsed) => {
-                if elapsed > scenario.duration_secs {
+                if elapsed > scenario.duration_secs && !scenario_ended {
                     // Hide window and prompt for replay
                     window.set_fullscreen(None);
                     window.set_minimized(true);
                     stats.end_scenario();
+                    scenario_ended = true;
                     stats.print_stats(&scenario.name, total_frame_count / stats.scenario_playtime());
 
                     if play_again() {
                         stats = Statistic::new();
+                        scenario_ended = false;
                         camera = Camera::new(scenario.player_spawn);
                         (target_vec, old_target) = create_target_vec(scenario);
                         total_frame_count = 0;
@@ -84,7 +87,7 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                         window_target.exit();
                         return;
                     }
-                } else {
+                } else if !scenario_ended {
                     // This is used for timer display
                     seconds = (scenario.duration_secs - elapsed).as_secs() + 1;
                     minutes = seconds / 60;
@@ -123,10 +126,12 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                                     end scenario to be able to display total time played
                                     print stats at the end
                                 */  stats.end_scenario();
+                                    scenario_ended = true;
                                     stats.print_stats(&scenario.name, total_frame_count / stats.scenario_playtime());
 
                                     if play_again() {
                                         stats = Statistic::new();
+                                        scenario_ended = false;
                                         camera = Camera::new(scenario.player_spawn);
                                         (target_vec, old_target) = create_target_vec(scenario);
                                         total_frame_count = 00;

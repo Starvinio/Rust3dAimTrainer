@@ -4,8 +4,7 @@ fn main() -> Result<(), engine::EngineError>
 {
     let colors = engine::color::Colors::detect_set_colors();
     engine::cli::print_logo(&colors);
-    engine::cli::print_categories(&colors);
-    let mut scenarios = engine::scenario::get_scenarios(engine::cli::get_list_type(), &colors);
+    let mut scenarios = engine::scenario::get_scenarios(engine::cli::get_category(&colors), &colors);
 
     for (i,scenario) in scenarios.iter().enumerate() {
         engine::rendering::cli::print_cli_select(i, &scenario.name, &colors);
