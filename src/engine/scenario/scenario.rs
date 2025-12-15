@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::engine::{Gun, Mesh, RoomType, Vec3d, create_room, scenario::{MovingTarget, TargetType}};
+use crate::engine::{Gun, Mesh, RoomType, Vec3d, create_room, scenario::{MovingTarget, TargetShape}, TargetSettings};
 use crate::engine::color::Colors;
 
 pub struct Scenario {
@@ -21,12 +21,7 @@ pub struct Scenario {
     pub room: Mesh,
 
     //target properties
-    pub target_type: TargetType,
-    pub target_spawn: (Vec3d, Vec3d),
-    pub target_count: i8,
-    pub target_rad: f32,
-    pub target_hp: i32,
-    pub moving_target: Option<MovingTarget>,
+    pub t_settings: TargetSettings
 }
 pub enum AimingType {
     StaticClicking,
@@ -44,15 +39,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Square,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 3,
-            target_rad: 0.9, //0.9
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Block,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 3,
+                rad: 0.9, //0.9
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -64,15 +61,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Rectangle,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 3,
-            target_rad: 0.9,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Block,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 3,
+                rad: 0.9,
+                hp: 1,
+                movement: None
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -84,15 +83,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Rectangle,
-            target_spawn: (
-                Vec3d::new(0.4, 0.4, 4.0),
-                Vec3d::new(-0.4, -0.4, 4.0)
-            ),
-            target_count: 3,
-            target_rad: 0.1,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Block,
+                spawn: (
+                    Vec3d::new(0.4, 0.4, 4.0),
+                    Vec3d::new(-0.4, -0.4, 4.0)
+                ),
+                count: 3,
+                rad: 0.1,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -104,15 +105,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 6,
-            target_rad: 0.25,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 6,
+                rad: 0.25,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -124,15 +127,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 6,
-            target_rad: 0.1,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 6,
+                rad: 0.1,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -144,15 +149,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 6,
-            target_rad: 0.05,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 6,
+                rad: 0.05,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -164,15 +171,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, 0.0),
             room: create_room(RoomType::Cone, 20.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(8.0, 3.0, 9.0),
-                Vec3d::new(-8.0, -3.0, 9.0)
-            ),
-            target_count: 6,
-            target_rad: 0.2,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(8.0, 3.0, 9.0),
+                    Vec3d::new(-8.0, -3.0, 9.0)
+                ),
+                count: 6,
+                rad: 0.2,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -184,15 +193,17 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 1.0, -2.0),
             room: create_room(RoomType::Cone, 20.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(8.0, 3.0, 9.0),
-                Vec3d::new(-8.0, -3.0, 9.0)
-            ),
-            target_count: 6,
-            target_rad: 0.2,
-            target_hp: 5,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(8.0, 3.0, 9.0),
+                    Vec3d::new(-8.0, -3.0, 9.0)
+                ),
+                count: 6,
+                rad: 0.2,
+                hp: 5,
+                movement: None,
+            },
             gun: Gun::laser(),
             allow_movement: false,
         }
@@ -204,29 +215,31 @@ impl Scenario {
             aiming_type: AimingType::EvasiveSwitching,
             player_spawn: Vec3d::new(0.0, -5.0, -2.0),
             room: create_room(RoomType::Cone, 10.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(6.0, -3.0, 9.0),
-                Vec3d::new(-6.0, -5.0, 7.0)
-            ),
-            target_count: 3,
-            target_rad: 0.3,
-            target_hp: 40,
-            moving_target: Some(
-                MovingTarget {
-                    moving_bounds: (
-                        Vec3d::new(6.0, -3.0, 9.0),
-                        Vec3d::new(-6.0, -5.0, 7.0)
-                    ),
-                    player_dist_r: 1.0,
-                    frequency: 0.3,
-                    p_change_dir: 10.0,
-                    vel_bounds: (
-                        Vec3d::new(2.0, 1.0, 0.2),
-                        Vec3d::new(2.0, 1.0, 0.5)
-                    ),
-                    interval_dir_change: 0.0,
-            }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(6.0, -3.0, 9.0),
+                    Vec3d::new(-6.0, -5.0, 7.0)
+                ),
+                count: 3,
+                rad: 0.3,
+                hp: 40,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(6.0, -3.0, 9.0),
+                            Vec3d::new(-6.0, -5.0, 7.0)
+                        ),
+                        player_dist_r: 1.0,
+                        frequency: 0.3,
+                        p_change_dir: 10.0,
+                        vel_bounds: (
+                            Vec3d::new(2.0, 1.0, 0.2),
+                            Vec3d::new(2.0, 1.0, 0.5)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::laser(),
             allow_movement: false,
         }
@@ -238,29 +251,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(90),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 5,
-            target_rad: 0.25,
-            target_hp: 1,
-            moving_target: Some(
-                MovingTarget { 
-                    moving_bounds: (
-                        Vec3d::new(4.0, 4.0, 4.0),
-                        Vec3d::new(-4.0, -4.0, 4.0)
-                    ), 
-                    player_dist_r: 1.0, 
-                    frequency: 0.3, 
-                    p_change_dir: 10.0, 
-                    vel_bounds: (
-                        Vec3d::new(2.0, 2.0, 0.0), 
-                        Vec3d::new(3.0, 3.0, 0.0)
-                    ), 
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 5,
+                rad: 0.25,
+                hp: 1,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(4.0, 4.0, 4.0),
+                            Vec3d::new(-4.0, -4.0, 4.0)
+                        ),
+                        player_dist_r: 1.0,
+                        frequency: 0.3,
+                        p_change_dir: 10.0,
+                        vel_bounds: (
+                            Vec3d::new(2.0, 2.0, 0.0),
+                            Vec3d::new(3.0, 3.0, 0.0)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -272,29 +287,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(90),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(4.0, 4.0, 4.0),
-                Vec3d::new(-4.0, -4.0, 4.0)
-            ),
-            target_count: 5,
-            target_rad: 0.1,
-            target_hp: 1,
-            moving_target: Some(
-                MovingTarget { 
-                    moving_bounds: (
-                        Vec3d::new(4.0, 4.0, 4.0),
-                        Vec3d::new(-4.0, -4.0, 4.0)
-                    ), 
-                    player_dist_r: 1.0, 
-                    frequency: 0.3, 
-                    p_change_dir: 10.00,
-                    vel_bounds: (
-                        Vec3d::new(2.0, 2.0, 0.0), 
-                        Vec3d::new(3.0, 3.0, 0.0)
-                    ), 
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(4.0, 4.0, 4.0),
+                    Vec3d::new(-4.0, -4.0, 4.0)
+                ),
+                count: 5,
+                rad: 0.1,
+                hp: 1,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(4.0, 4.0, 4.0),
+                            Vec3d::new(-4.0, -4.0, 4.0)
+                        ),
+                        player_dist_r: 1.0,
+                        frequency: 0.3,
+                        p_change_dir: 10.00,
+                        vel_bounds: (
+                            Vec3d::new(2.0, 2.0, 0.0),
+                            Vec3d::new(3.0, 3.0, 0.0)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -306,29 +323,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 0.0, -2.0),
             room: create_room(RoomType::Cube, 7.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(6.0, 1.0, 6.0),
-                Vec3d::new(-6.0, -1.0, 4.0)
-            ),
-            target_count: 5,
-            target_rad: 0.08,
-            target_hp: 1,
-            moving_target: Some(
-                MovingTarget {
-                    moving_bounds: (
-                        Vec3d::new(6.0, 1.0, 6.0),
-                        Vec3d::new(-6.0, -1.0, 4.0)
-                    ),
-                    player_dist_r: 1.0,
-                    frequency: 0.1,
-                    p_change_dir: 0.5,
-                    vel_bounds: (
-                        Vec3d::new(0.8, 0.1, 0.2),
-                        Vec3d::new(1.0, 0.2, 0.2)
-                    ),
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(6.0, 1.0, 6.0),
+                    Vec3d::new(-6.0, -1.0, 4.0)
+                ),
+                count: 5,
+                rad: 0.08,
+                hp: 1,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(6.0, 1.0, 6.0),
+                            Vec3d::new(-6.0, -1.0, 4.0)
+                        ),
+                        player_dist_r: 1.0,
+                        frequency: 0.1,
+                        p_change_dir: 0.5,
+                        vel_bounds: (
+                            Vec3d::new(0.8, 0.1, 0.2),
+                            Vec3d::new(1.0, 0.2, 0.2)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -340,29 +359,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 0.0, -2.0),
             room: create_room(RoomType::Cube, 7.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(6.0, 1.0, 6.0),
-                Vec3d::new(-6.0, -1.0, 4.0)
-            ),
-            target_count: 5,
-            target_rad: 0.03,
-            target_hp: 1,
-            moving_target: Some(
-                MovingTarget {
-                    moving_bounds: (
-                        Vec3d::new(6.0, 1.0, 6.0),
-                        Vec3d::new(-6.0, -1.0, 4.0)
-                    ),
-                    player_dist_r: 1.0,
-                    frequency: 0.1,
-                    p_change_dir: 0.5,
-                    vel_bounds: (
-                        Vec3d::new(0.6, 0.1, 0.1),
-                        Vec3d::new(0.8, 0.2, 0.1)
-                    ),
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(6.0, 1.0, 6.0),
+                    Vec3d::new(-6.0, -1.0, 4.0)
+                ),
+                count: 5,
+                rad: 0.03,
+                hp: 1,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(6.0, 1.0, 6.0),
+                            Vec3d::new(-6.0, -1.0, 4.0)
+                        ),
+                        player_dist_r: 1.0,
+                        frequency: 0.1,
+                        p_change_dir: 0.5,
+                        vel_bounds: (
+                            Vec3d::new(0.6, 0.1, 0.1),
+                            Vec3d::new(0.8, 0.2, 0.1)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::pistol(),
             allow_movement: false,
         }
@@ -374,29 +395,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, -4.0, 0.0),
             room: create_room(RoomType::Octagon, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(0.0, -4.0, 5.0),
-                Vec3d::new(0.0, -4.0, 5.0)
-            ),
-            target_count: 1,
-            target_rad: 0.6,
-            target_hp: 99999,
-            moving_target: Some(
-                MovingTarget { 
-                    moving_bounds: (
-                        Vec3d::new(4.0, 0.0, 4.0),
-                        Vec3d::new(-4.0, -4.0, -4.0)
-                    ), 
-                    player_dist_r: 1.0, 
-                    frequency: 0.2, 
-                    p_change_dir: 12.0, 
-                    vel_bounds: (
-                        Vec3d::new(3.0, 3.0, 3.0), 
-                        Vec3d::new(5.0, 5.0, 5.0)
-                    ), 
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(0.0, -4.0, 5.0),
+                    Vec3d::new(0.0, -4.0, 5.0)
+                ),
+                count: 1,
+                rad: 0.6,
+                hp: 99999,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(4.0, 0.0, 4.0),
+                            Vec3d::new(-4.0, -4.0, -4.0)
+                        ),
+                        player_dist_r: 1.0,
+                        frequency: 0.2,
+                        p_change_dir: 12.0,
+                        vel_bounds: (
+                            Vec3d::new(3.0, 3.0, 3.0),
+                            Vec3d::new(5.0, 5.0, 5.0)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::laser(),
             allow_movement: false,
         }
@@ -408,29 +431,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, -1.5, 0.0),
             room: create_room(RoomType::Octagon, 4.0),
-            target_type: TargetType::Bean,
-            target_spawn: (
-                Vec3d::new(0.0, 0.0, 5.0),
-                Vec3d::new(0.0, 0.0, 5.0)
-            ),
-            target_count: 1,
-            target_rad: 0.8,
-            target_hp: 99999,
-            moving_target: Some(
-                MovingTarget {
-                    moving_bounds: (
-                        Vec3d::new(3.0, -2.0, 3.0),
-                        Vec3d::new(-3.0, -2.0, -3.0)
-                    ),
-                    player_dist_r: 2.0,
-                    frequency: 0.2,
-                    p_change_dir: 40.0,
-                    vel_bounds: (
-                        Vec3d::new(4.0, 0.0, 4.0),
-                        Vec3d::new(5.0, 0.0, 5.0)
-                    ),
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Bean,
+                spawn: (
+                    Vec3d::new(0.0, 0.0, 5.0),
+                    Vec3d::new(0.0, 0.0, 5.0)
+                ),
+                count: 1,
+                rad: 0.8,
+                hp: 99999,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(3.0, -2.0, 3.0),
+                            Vec3d::new(-3.0, -2.0, -3.0)
+                        ),
+                        player_dist_r: 2.0,
+                        frequency: 0.2,
+                        p_change_dir: 40.0,
+                        vel_bounds: (
+                            Vec3d::new(4.0, 0.0, 4.0),
+                            Vec3d::new(5.0, 0.0, 5.0)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::laser(),
             allow_movement: true,
         }
@@ -442,29 +467,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, -3.0, 0.0),
             room: create_room(RoomType::Cube, 10.0),
-            target_type: TargetType::Bean,
-            target_spawn: (
-                Vec3d::new(0.0, -4.0, 9.0),
-                Vec3d::new(0.0, -4.0, 9.0)
-            ),
-            target_count: 1,
-            target_rad: 0.4,
-            target_hp: 99999,
-            moving_target: Some(
-                MovingTarget {
-                    moving_bounds: (
-                        Vec3d::new(9.0, 0.0, 9.0),
-                        Vec3d::new(-9.0, -8.0, 9.0)
-                    ),
-                    player_dist_r: 7.0,
-                    frequency: 0.02,
-                    p_change_dir: 2.0,
-                    vel_bounds: (
-                        Vec3d::new(4.0, 1.0, 4.0),
-                        Vec3d::new(6.0, 1.0, 6.0)
-                    ),
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Bean,
+                spawn: (
+                    Vec3d::new(0.0, -4.0, 9.0),
+                    Vec3d::new(0.0, -4.0, 9.0)
+                ),
+                count: 1,
+                rad: 0.4,
+                hp: 99999,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(9.0, 0.0, 9.0),
+                            Vec3d::new(-9.0, -8.0, 9.0)
+                        ),
+                        player_dist_r: 7.0,
+                        frequency: 0.02,
+                        p_change_dir: 2.0,
+                        vel_bounds: (
+                            Vec3d::new(4.0, 1.0, 4.0),
+                            Vec3d::new(6.0, 1.0, 6.0)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::laser(),
             allow_movement: true,
         }
@@ -476,29 +503,31 @@ impl Scenario {
             duration_secs: Duration::from_secs(60),
             player_spawn: Vec3d::new(0.0, 0.0, -3.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Sphere,
-            target_spawn: (
-                Vec3d::new(0.0, 0.0, 5.0),
-                Vec3d::new(0.0, 0.0, 5.0)
-            ),
-            target_count: 1,
-            target_rad: 0.3,
-            target_hp: 99999,
-            moving_target: Some(
-                MovingTarget {
-                    moving_bounds: (
-                        Vec3d::new(4.0, 3.0, 4.0),
-                        Vec3d::new(-4.0, -3.0, 0.0)
-                    ),
-                    player_dist_r: 3.0,
-                    frequency: 0.5,
-                    p_change_dir: 20.0,
-                    vel_bounds: (
-                        Vec3d::new(2.0, 2.0, 2.0),
-                        Vec3d::new(3.0, 3.0, 3.0)
-                    ),
-                    interval_dir_change: 0.0,
-                }),
+            t_settings: TargetSettings {
+                shape: TargetShape::Sphere,
+                spawn: (
+                    Vec3d::new(0.0, 0.0, 5.0),
+                    Vec3d::new(0.0, 0.0, 5.0)
+                ),
+                count: 1,
+                rad: 0.3,
+                hp: 99999,
+                movement: Some(
+                    MovingTarget {
+                        mv_bounds: (
+                            Vec3d::new(4.0, 3.0, 4.0),
+                            Vec3d::new(-4.0, -3.0, 0.0)
+                        ),
+                        player_dist_r: 3.0,
+                        frequency: 0.5,
+                        p_change_dir: 20.0,
+                        vel_bounds: (
+                            Vec3d::new(2.0, 2.0, 2.0),
+                            Vec3d::new(3.0, 3.0, 3.0)
+                        ),
+                        interval_dir_change: 0.0,
+                    }),
+            },
             gun: Gun::laser(),
             allow_movement: false,
         }
@@ -507,18 +536,20 @@ impl Scenario {
         Scenario {
             name: String::from("Pure Horizontal Click"),
             aiming_type: AimingType::StaticClicking,
-            duration_secs: Duration::from_secs(999),
+            duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Square,
-            target_spawn: (
-                Vec3d::new(5.0, 0.0, 4.0),
-                Vec3d::new(-5.0, 0.0, 4.0)
-            ),
-            target_count: 3,
-            target_rad: 0.5,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Block,
+                spawn: (
+                    Vec3d::new(5.0, 0.0, 4.0),
+                    Vec3d::new(-5.0, 0.0, 4.0)
+                ),
+                count: 3,
+                rad: 0.5,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: true,
         }
@@ -527,18 +558,20 @@ impl Scenario {
         Scenario {
             name: String::from("Pure Vertical Click"),
             aiming_type: AimingType::StaticClicking,
-            duration_secs: Duration::from_secs(999),
+            duration_secs: Duration::from_secs(30),
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
-            target_type: TargetType::Square,
-            target_spawn: (
-                Vec3d::new(0.0, 5.0, 4.0),
-                Vec3d::new(0.0, -5.0, 4.0)
-            ),
-            target_count: 3,
-            target_rad: 0.5,
-            target_hp: 1,
-            moving_target: None,
+            t_settings: TargetSettings {
+                shape: TargetShape::Block,
+                spawn: (
+                    Vec3d::new(0.0, 5.0, 4.0),
+                    Vec3d::new(0.0, -5.0, 4.0)
+                ),
+                count: 3,
+                rad: 0.5,
+                hp: 1,
+                movement: None,
+            },
             gun: Gun::pistol(),
             allow_movement: true,
         }

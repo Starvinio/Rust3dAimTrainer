@@ -8,15 +8,16 @@ use std::{
 use winit::{
     event::{DeviceEvent, ElementState, Event, MouseButton, WindowEvent},
     keyboard::{KeyCode, PhysicalKey},
+    window::Fullscreen,
 };
-use crate::engine::{Statistic, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Scenario, add_target, create_target_vec}, draw_texture_optimized, GUI, GUI_TXT_PATH, EngineError};
 use rodio::{Decoder, Source};
-use winit::window::Fullscreen;
-use crate::engine::cli::play_again;
+
+use crate::engine::{Statistic, draw_texture_optimized, GUI, GUI_TXT_PATH, EngineError, camera::Camera, core::{CONFIG, HIT_TARGET, Mat4x4, TriToRaster}, input::InputState, rendering::{draw_crosshair, render_triangles, room_proj_loop, target_proj_loop, tri_clip_xy, window}, scenario::{Scenario}, cli::play_again, TargetVec, draw_fps, Timer};
+use crate::engine::camera::FPS;
 
 pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
-
     let (event_loop, window) = window::event_loop_setup()?;
+
     // Initialize softbuffer
     let context = Context::new(&window)?;
     let mut surface = Surface::new(&context, &window)?;
@@ -26,9 +27,10 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let mut user_input = InputState::new();
     let mut stats = Statistic::new();
 
-    // Initialize targets inside vector
-    let (mut target_vec, mut old_target) = create_target_vec(scenario);
+    // Initialize target vector
+    let mut target_vec = TargetVec::init(&scenario.t_settings);
 
+    // Pre-allocate Vectors
     let mut tri_vec: Vec<TriToRaster> = Vec::with_capacity(1024);
     let mut target_tri_vec: Vec<TriToRaster> = Vec::with_capacity(256);
     let mut tri_clipped: Vec<TriToRaster> = Vec::with_capacity(4);
@@ -36,18 +38,12 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let mut window_size = window.inner_size();
     let mut proj_matrix = Mat4x4::projection(window_size.width as f32, window_size.height as f32);
 
-    // Used for random target movement
     let mut rng = rand::thread_rng();
 
-    // Later divided by playtime
-    let mut total_frame_count: u32 = 0;
+    // FPS vars
+    let mut fps = FPS::init();
 
-    let mut fps_str = String::from("0");
-    let mut interval_frame_count = 0;
-    let mut last_fps_display = Instant::now();
-
-    let (mut minutes, mut seconds) = (0, 0);
-    let mut scenario_ended = false;
+    let mut timer = Timer::new();
 
     // SFX setup
     let mut stream_handle = rodio::OutputStreamBuilder::open_default_stream()?;
@@ -66,20 +62,18 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
 
         match stats.scenario_starttime.elapsed() {
             Ok(elapsed) => {
-                if elapsed > scenario.duration_secs && !scenario_ended {
+                if elapsed > scenario.duration_secs && !stats.scenario_ended {
                     // Hide window and prompt for replay
                     window.set_fullscreen(None);
                     window.set_minimized(true);
                     stats.end_scenario();
-                    scenario_ended = true;
-                    stats.print_stats(&scenario.name, total_frame_count / stats.scenario_playtime());
+                    stats.print_stats(&scenario.name, fps.total_frame_count / stats.scenario_playtime());
 
                     if play_again() {
                         stats = Statistic::new();
-                        scenario_ended = false;
                         camera = Camera::new(scenario.player_spawn);
-                        (target_vec, old_target) = create_target_vec(scenario);
-                        total_frame_count = 0;
+                        target_vec = TargetVec::init(&scenario.t_settings);
+                        fps.total_frame_count = 0;
                         window.set_minimized(false);
                         window.set_fullscreen(Some(Fullscreen::Borderless(None)));
                         window.focus_window();
@@ -87,11 +81,10 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                         window_target.exit();
                         return;
                     }
-                } else if !scenario_ended {
+                } else if !stats.scenario_ended {
                     // This is used for timer display
-                    seconds = (scenario.duration_secs - elapsed).as_secs() + 1;
-                    minutes = seconds / 60;
-                    seconds -= minutes * 60;
+                    timer.seconds = (scenario.duration_secs - elapsed).as_secs() + 1;
+                    timer.update_mins();
                 }
                 
             }
@@ -126,15 +119,13 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                                     end scenario to be able to display total time played
                                     print stats at the end
                                 */  stats.end_scenario();
-                                    scenario_ended = true;
-                                    stats.print_stats(&scenario.name, total_frame_count / stats.scenario_playtime());
+                                    stats.print_stats(&scenario.name, fps.total_frame_count / stats.scenario_playtime());
 
                                     if play_again() {
                                         stats = Statistic::new();
-                                        scenario_ended = false;
                                         camera = Camera::new(scenario.player_spawn);
-                                        (target_vec, old_target) = create_target_vec(scenario);
-                                        total_frame_count = 00;
+                                        target_vec = TargetVec::init(&scenario.t_settings);
+                                        fps.total_frame_count = 00;
                                         window.set_minimized(false);
                                         window.set_fullscreen(Some(Fullscreen::Borderless(None)));
                                         window.focus_window();
@@ -146,8 +137,8 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                                 if keycode == KeyCode::KeyR {
                                     stats = Statistic::new();
                                     camera = Camera::new(scenario.player_spawn);
-                                    (target_vec, old_target) = create_target_vec(scenario);
-                                    total_frame_count = 0;
+                                    target_vec = TargetVec::init(&scenario.t_settings);
+                                    fps.total_frame_count = 0;
 
                                 }
                                 user_input.pressed_key(keycode);
@@ -169,8 +160,7 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                 },
 
                 WindowEvent::RedrawRequested => {
-                    total_frame_count+=1;
-                    interval_frame_count+=1;
+                    fps.total_frame_count+=1; fps.interval_frame_count+=1;
                     let now = Instant::now();
                     let delta_time = now.duration_since(camera.last_frame_time).as_secs_f32();
                     
@@ -209,25 +199,16 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
 
                 /*  
                     This is the main target loop.
-                    To avoid redundant looping, we handle both movement, rendering and hit detection in this loop 
-                */  for target in &mut target_vec {
-
+                    To avoid redundant looping, we handle both movement, rendering and hit detection in this loop
+                */  for target in &mut target_vec.vec {
                         target.random_movement(camera.position, &mut rng, delta_time);
-
                         let hit = target_proj_loop(target, &mut target_tri_vec, &camera,  gun_shot, &proj_matrix);
-
                         if hit {
-
-                            if scenario.gun.automatic {
-                                stream_handle.mixer().add(src_hit_target.clone());
-                            } else {
-                                stream_handle.mixer().add(src_hit_target.clone());
-                            }
-
+                            stream_handle.mixer().add(src_hit_target.clone());
                             hit_target = true;
                             target.hp -= 1;
                             if target.hp < 1 {
-                                old_target = Some(target.position);
+                                target_vec.old = Some(target.position);
                             }
                         }
                         
@@ -260,58 +241,24 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                         tri_clip_xy(tri2d, &mut tri_clipped);
                         render_triangles(&mut pixel_buffer, &tri_clipped, width, height);
                     }
+                    
+                    // Crosshair is drawn based on users settings in config.toml
+                    draw_crosshair(&mut pixel_buffer, CONFIG.crosshair, width, height);
 
-                /*
-                    Crosshair is drawn based on users settings in config.toml
-                */  draw_crosshair(&mut pixel_buffer, CONFIG.crosshair, width, height);
-
-                    let center_width = (width / 2) as i32;
-
+                    // Logo is drawn statically
                     draw_texture_optimized(&mut pixel_buffer, width, height, &gui.logo, 0, 0);
-                    draw_texture_optimized(&mut pixel_buffer, width, height, &gui.colon, center_width - 9, 0);
+                    
+                    timer.draw_timer(&mut pixel_buffer, width, height, &gui);
 
-                    let minutes_last_digit = (minutes % 10) as usize;
-                    let minutes_front_digit = (minutes as usize - minutes_last_digit) / 10;
-                    draw_texture_optimized(&mut pixel_buffer, width, height, &gui.digits_timer[minutes_front_digit], center_width - 30 * 2 - 9, 0);
-                    draw_texture_optimized(&mut pixel_buffer, width, height, &gui.digits_timer[minutes_last_digit], center_width - 30 - 9, 0);
-
-                    let seconds_last_digit = (seconds % 10) as usize;
-                    let seconds_front_digit = (seconds as usize - seconds_last_digit) / 10;
-                    draw_texture_optimized(&mut pixel_buffer, width, height, &gui.digits_timer[seconds_front_digit], center_width + 9, 0);
-                    draw_texture_optimized(&mut pixel_buffer, width, height, &gui.digits_timer[seconds_last_digit], center_width + 9 + 30, 0);
-
-                    if now.duration_since(last_fps_display).as_secs_f32() >= 1.0 {
-                        fps_str = interval_frame_count.to_string();
-                        last_fps_display = Instant::now();
-                        interval_frame_count = 0;
-                    }
-
-                    let digit_width = 17;
-                    let total_width = digit_width * fps_str.len();
-
-                    for (i, byte) in fps_str.bytes().enumerate() {
-                            let digit = (byte - b'0') as usize;
-
-                            // Right-aligned X coordinate
-                            let x = width as i32 - total_width as i32 + (i * digit_width) as i32;
-
-                            draw_texture_optimized(
-                                &mut pixel_buffer,
-                                width,
-                                height,
-                                &gui.digits_fps[digit],
-                                x,
-                                0,
-                            );
-
-                    }
+                    fps.update_str(now);
+                    draw_fps(&fps, &mut pixel_buffer, width, height, &gui.digits_fps);
 
 
                 /*
                     Remove Targets with hp <= 0 and spawn in a new one to keep the target count consistent
-                */  target_vec.retain(|x| x.hp > 0);
-                    if target_vec.len() < scenario.target_count as usize {
-                        add_target(scenario, &mut target_vec, old_target);
+                */  target_vec.vec.retain(|x| x.hp > 0);
+                    if target_vec.vec.len() < scenario.t_settings.count {
+                        target_vec.add_target();
                     }
                 
                 /*

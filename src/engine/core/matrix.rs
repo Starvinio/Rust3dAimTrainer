@@ -162,9 +162,9 @@ impl Mat4x4 {
         }
     }
     pub fn project_vec(&self, v: Vec3d) -> Vec2d {
-        let x = v.x * self.m[0][0] + v.y * self.m[1][0] + v.z * self.m[2][0] + self.m[3][0];
-        let y = v.x * self.m[0][1] + v.y * self.m[1][1] + v.z * self.m[2][1] + self.m[3][1];
-        let w = v.x * self.m[0][3] + v.y * self.m[1][3] + v.z * self.m[2][3] + self.m[3][3];
+        let x = v.x * self.m[00][0] + v.y * self.m[1][0] + v.z * self.m[2][0] + self.m[3][0];
+        let y = v.x * self.m[00][1] + v.y * self.m[1][1] + v.z * self.m[2][1] + self.m[3][1];
+        let w = v.x * self.m[00][3] + v.y * self.m[1][3] + v.z * self.m[2][3] + self.m[3][3];
 
         if w != 0.0 {
             Vec2d::new(x / w, y / w)
@@ -172,7 +172,7 @@ impl Mat4x4 {
             Vec2d::new(x, y)
         }
     }
-    pub fn quickinverse(&self) -> Mat4x4 {
+    pub fn quick_inverse(&self) -> Mat4x4 {
         // !!Only use for rotation/translation matrices!!
         let mut matrix: Mat4x4 = Mat4x4::zero();
 

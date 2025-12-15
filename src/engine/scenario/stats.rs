@@ -7,7 +7,8 @@ pub struct Statistic {
     pub shots:u32,
     pub accuracy:f32,
     pub scenario_starttime:SystemTime,
-    pub scenario_endtime:SystemTime
+    pub scenario_endtime:SystemTime,
+    pub scenario_ended:bool
 }
 impl Statistic {
     pub fn new() -> Self {
@@ -17,6 +18,7 @@ impl Statistic {
             accuracy:0.0,
             scenario_starttime:SystemTime::now(),
             scenario_endtime:SystemTime::now(),
+            scenario_ended: false
         }
     }
     pub fn add_hit(&mut self) {
@@ -33,7 +35,8 @@ impl Statistic {
         self.accuracy
     }
     pub fn end_scenario(&mut self) {
-        self.scenario_endtime = SystemTime::now()
+        self.scenario_endtime = SystemTime::now();
+        self.scenario_ended = true;
     }
     pub fn scenario_playtime(&self) -> u32 {
         self.scenario_endtime.duration_since(self.scenario_starttime).unwrap().as_secs() as u32

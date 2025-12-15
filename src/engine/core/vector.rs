@@ -1,4 +1,6 @@
 use std::ops::{Add, Sub, Mul, Div};
+use rand::prelude::ThreadRng;
+use rand::Rng;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3d {
@@ -36,8 +38,16 @@ impl Vec3d {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
+    pub fn zero() -> Self {Self {x:0.0, y:0.0, z:0.0}}
     pub fn from_tuple(tuple:(f32,f32,f32)) -> Self {
         Self { x: tuple.0, y: tuple.1, z: tuple.2 }
+    }
+    pub fn from_rng_range(a:Vec3d, b:Vec3d, rng:&mut ThreadRng) -> Self {
+        Self {
+            x: rng.gen_range(a.x.min(b.x)..=a.x.max(b.x)),
+            y: rng.gen_range(a.y.min(b.y)..=a.y.max(b.y)),
+            z: rng.gen_range(a.z.min(b.z)..=a.z.max(b.z)),
+        }
     }
     pub fn to_f32(&self) -> (f32,f32,f32) {
         (self.x, self.y, self.z)

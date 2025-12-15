@@ -1,5 +1,7 @@
 use std::io::BufReader;
 use serde::Deserialize;
+use crate::engine::camera::FPS;
+use crate::engine::{FPS_DIGIT_WIDTH, TIMER_DIGIT_WIDTH};
 use crate::engine::rasterizer::put_pixel;
 
 pub struct GUI {
@@ -45,8 +47,8 @@ impl GUI {
 }
 
 pub struct Texture {
-    pub width: u32,
-    pub height: u32,
+    pub width: usize,
+    pub height: usize,
     pub data: Vec<u32>, // ARGB format
 }
 impl Texture {
@@ -59,8 +61,8 @@ impl Texture {
         let mut buf = vec![0; reader.output_buffer_size().unwrap()];
         let info = reader.next_frame(&mut buf).map_err(|e| e.to_string())?;
 
-        let width = info.width;
-        let height = info.height;
+        let width = info.width as usize;
+        let height = info.height as usize;
 
         let mut data = Vec::with_capacity((width * height) as usize);
 
@@ -88,11 +90,11 @@ impl Texture {
         Ok(Self { width, height, data })
     }
 
-    pub fn extract_region(&self, start_x: u32, start_y: u32, end_x: u32, end_y: u32) -> Self {
+    pub fn extract_region(&self, start_x: usize, start_y: usize, end_x: usize, end_y: usize) -> Self {
         let width  = end_x - start_x;
         let height = end_y - start_y;
 
-        let mut data = Vec::with_capacity((width * height) as usize);
+        let mut data = Vec::with_capacity(width * height);
 
         for dy in 0..height {
             for dx in 0..width {
@@ -100,7 +102,7 @@ impl Texture {
                 let src_y = start_y + dy;
 
                 let pixel = if src_x < self.width && src_y < self.height {
-                    let idx = (src_y * self.width + src_x) as usize;
+                    let idx = src_y * self.width + src_x;
                     self.data.get(idx).copied().unwrap_or(0)
                 } else {
                     0
@@ -114,9 +116,68 @@ impl Texture {
     }
 
     // Create a texture from raw ARGB data
-    pub fn from_argb(width: u32, height: u32, data: Vec<u32>) -> Self {
+    pub fn from_argb(width: usize, height: usize, data: Vec<u32>) -> Self {
         Self { width, height, data }
     }
+}
+
+pub struct Timer {
+    pub minutes: u64,
+    pub seconds: u64
+}
+impl Timer {
+    pub fn new() -> Self {
+        Self {minutes:0, seconds:0}
+    }
+    pub fn update_mins(&mut self) {
+        self.minutes = self.seconds / 60;
+        self.seconds -= self.minutes * 60;
+    }
+    pub fn draw_timer(&self, pixel_buffer: &mut [u32], width:usize, height: usize, gui: &GUI) {
+
+        let center_width = (width / 2);
+        draw_texture_optimized(pixel_buffer, width, height, &gui.colon, center_width - 9, 0);
+        
+        let minutes_str = self.minutes.to_string();
+        for (i, byte) in minutes_str.bytes().enumerate() {
+            let digit = (byte - b'0') as usize;
+
+            let x = center_width - 9 - (minutes_str.len() * TIMER_DIGIT_WIDTH) + (i * TIMER_DIGIT_WIDTH);
+
+            draw_texture_optimized(
+                pixel_buffer, 
+                width, 
+                height, 
+                &gui.digits_timer[digit], 
+                x, 
+                0
+            );
+        }
+
+        let seconds_last_digit = (self.seconds % 10) as usize;
+        let seconds_front_digit = (self.seconds as usize - seconds_last_digit) / 10;
+        draw_texture_optimized(pixel_buffer, width, height, &gui.digits_timer[seconds_front_digit], center_width + 9, 0);
+        draw_texture_optimized(pixel_buffer, width, height, &gui.digits_timer[seconds_last_digit], center_width + 9 + 30, 0);
+    }
+    /*
+    pub fn draw_fps(fps: &FPS, pixel_buffer: &mut [u32], width: usize, height: usize, texture: &[Texture]) {
+    for (i, byte) in fps.fps_str.bytes().enumerate() {
+        let digit = (byte - b'0') as usize;
+
+        let x = width - fps.width_px  + (i * FPS_DIGIT_WIDTH);
+
+        draw_texture_optimized(
+            pixel_buffer,
+            width,
+            height,
+            &texture[digit],
+            x,
+            0,
+        );
+
+    }
+}
+    */
 }
 
 /// Draw a texture at position (x, y)
@@ -125,17 +186,17 @@ pub fn draw_texture_optimized(
     buffer_width: usize,
     buffer_height: usize,
     texture: &Texture,
-    x: i32,
-    y: i32,
+    x: usize,
+    y: usize,
 ) {
-    let tex_width = texture.width as i32;
-    let tex_height = texture.height as i32;
+    let tex_width = texture.width;
+    let tex_height = texture.height;
 
     // Calculate visible region (clipping)
     let start_x = x.max(0);
     let start_y = y.max(0);
-    let end_x = (x + tex_width).min(buffer_width as i32);
-    let end_y = (y + tex_height).min(buffer_height as i32);
+    let end_x = (x + tex_width).min(buffer_width);
+    let end_y = (y + tex_height).min(buffer_height);
 
     if start_x >= end_x || start_y >= end_y {
         return; // Fully clipped
@@ -194,6 +255,24 @@ pub fn blend_pixel_fast(dst: u32, src: u32, alpha: u32) -> u32 {
     let g = ((src_g * alpha + dst_g * inv_alpha) >> 8) & 0x0000FF00;
 
     0xFF000000 | rb | g
+}
+
+pub fn draw_fps(fps: &FPS, pixel_buffer: &mut [u32], width: usize, height: usize, texture: &[Texture]) {
+    for (i, byte) in fps.fps_str.bytes().enumerate() {
+        let digit = (byte - b'0') as usize;
+
+        let x = width - fps.width_px  + (i * FPS_DIGIT_WIDTH);
+
+        draw_texture_optimized(
+            pixel_buffer,
+            width,
+            height,
+            &texture[digit],
+            x,
+            0,
+        );
+
+    }
 }
 
 

@@ -79,6 +79,9 @@ pub const BLUE: &str = "\x1b[94m";
 pub const RED: &str = "\x1b[31m";
 pub const RESET: &str = "\x1b[0m";
 
+pub const TIMER_DIGIT_WIDTH:usize = 30;
+pub const FPS_DIGIT_WIDTH: usize = 17;
+
 pub fn load_config(path: &Path) -> Config {
     let config_str = fs::read_to_string(path).unwrap_or_else(|e| panic!("Failed to read config file at {:?}: {}", path, e));
 
