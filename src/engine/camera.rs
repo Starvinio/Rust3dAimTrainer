@@ -1,7 +1,7 @@
 use std::time::Instant;
 use std::f32::consts::{PI, FRAC_PI_2};
 
-use crate::engine::{draw_texture_optimized, Mat4x4, FPS_DIGIT_WIDTH};
+use crate::engine::{Mat4x4, FPS_DIGIT_WIDTH};
 use crate::engine::core::{Vec3d, CONFIG};
 
 pub struct Camera {

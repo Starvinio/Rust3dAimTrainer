@@ -1,7 +1,6 @@
 
 use crate::engine::{CONFIG, Mat4x4, Triangle, Vec3d, dyn_clamp_pos};
 use rand::{Rng, rngs::ThreadRng};
-use rodio::decoder::Settings;
 
 pub struct Target {
     // Triangles for target visuals

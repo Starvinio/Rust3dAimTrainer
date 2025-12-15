@@ -135,7 +135,7 @@ impl Timer {
     }
     pub fn draw_timer(&self, pixel_buffer: &mut [u32], width:usize, height: usize, gui: &GUI) {
 
-        let center_width = (width / 2);
+        let center_width = width / 2;
         draw_texture_optimized(pixel_buffer, width, height, &gui.colon, center_width - 9, 0);
         
         let minutes_str = self.minutes.to_string();
