@@ -10,10 +10,9 @@ pub fn print_logo(colors: &Colors) {
  |  _  / | | / __| __|   / /\ \ | | '_ ` _ \     | | '__/ _` | | '_ \ / _ \ '__|
  | | \ \ |_| \__ \ |_   / ____ \| | | | | | |    | | | (_| | | | | |  __/ |
  |_|  \_\__,_|___/\__| /_/    \_\_|_| |_| |_|    |_|_|  \__,_|_|_| |_|\___|_|
-
-
+ v1.0.0
 "#;
-    println!("{}{}{}Welcome to the Rust 3D Aim Trainer!{}\n", colors.red, logo, colors.blue, colors.reset);
+    println!("{}{}{}", colors.red, logo, colors.reset);
 }
 
 pub fn print_cli_select(n:usize, message:&str, colors: &Colors) {
@@ -29,13 +28,13 @@ pub fn print_categories(colors: &Colors) {
     print_cli_select(4, "Precise Tracking", &colors);
     print_cli_select(5, "Speed Switching", &colors);
     print_cli_select(6, "Evasive Switching", &colors);
-    print!("\nSelect category by entering a number between '{}0{}' and '{}6{}': ",
-             colors.blue, colors.reset, colors.blue, colors.reset
+    print!("\nSelect {}category{} by entering a number between '{}0{}' and '{}6{}': ",
+           colors.blue, colors.reset, colors.blue, colors.reset, colors.blue, colors.reset
     );
     match io::stdout().flush() {
         Err(_) => {
-            println!("\nSelect category by entering a number between '{}0{}' and '{}6{}': ",
-                   colors.blue, colors.reset, colors.blue, colors.reset
+            println!("\nSelect {}category{} by entering a number between '{}0{}' and '{}6{}': ",
+                     colors.blue, colors.reset, colors.blue, colors.reset, colors.blue, colors.reset
             );
         },
         _ => {}
@@ -67,7 +66,7 @@ pub fn get_category(colors: &Colors) -> usize {
 }
 
 pub fn get_scenario_index(len: usize, colors: &Colors) -> usize {
-    print!("\nPlease select a {}scenario{} by entering a number between '{}0{}' and '{}{}{}': ",
+    print!("\nSelect {}scenario{} by entering a number between '{}0{}' and '{}{}{}': ",
              colors.blue, colors.reset, colors.blue, colors.reset, colors.blue, len-1, colors.reset);
     match io::stdout().flush() {
         Err(_) => {

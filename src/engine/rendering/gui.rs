@@ -1,7 +1,7 @@
 use std::io::BufReader;
 use serde::Deserialize;
 use crate::engine::camera::FPS;
-use crate::engine::{FPS_DIGIT_WIDTH, TIMER_DIGIT_WIDTH};
+use crate::engine::{EngineError, FPS_DIGIT_WIDTH, TIMER_DIGIT_WIDTH};
 use crate::engine::rasterizer::put_pixel;
 
 pub struct GUI {
@@ -11,8 +11,8 @@ pub struct GUI {
     pub colon: Texture,
 }
 impl GUI {
-    pub fn load_gui(path: &str) -> Self {
-        let texture = Texture::load_from_png(path).unwrap();
+    pub fn load_gui(path: &str) -> Result<Self, EngineError> {
+        let texture = Texture::load_from_png(path)?;
         let digits_timer = [
             texture.extract_region(0, 75, 33, 130), // 0
             texture.extract_region(0, 150, 33, 205), // 1
@@ -37,34 +37,35 @@ impl GUI {
             texture.extract_region(136, 45, 153, 70),
             texture.extract_region(153, 45, 170, 70),
         ];
-        GUI {
+        Ok(GUI {
             logo: texture.extract_region(0, 0, 222, 50),
             digits_timer,
             digits_fps,
             colon: texture.extract_region(0, 815, 18, 865)
-        }
+        })
     }
 }
 
 pub struct Texture {
     pub width: usize,
     pub height: usize,
-    pub data: Vec<u32>, // ARGB format
+    pub data: Vec<u32>,
 }
 impl Texture {
-    pub fn load_from_png(path: &str) -> Result<Self, String> {
+    pub fn load_from_png(path: &str) -> Result<Self, EngineError> {
 
-        let file = std::fs::File::open(path).map_err(|e| e.to_string())?;
+        let file = std::fs::File::open(path).map_err(|_| EngineError::GUILoadErr)?;
         let buf_reader = BufReader::new(file);
         let decoder = png::Decoder::new(buf_reader);
-        let mut reader = decoder.read_info().map_err(|e| e.to_string())?;
-        let mut buf = vec![0; reader.output_buffer_size().unwrap()];
-        let info = reader.next_frame(&mut buf).map_err(|e| e.to_string())?;
+        let mut reader = decoder.read_info()?;
+
+        let mut buf = vec![0; reader.output_buffer_size().ok_or(EngineError::GUILoadErr)?];
+        let info = reader.next_frame(&mut buf).map_err(|_| EngineError::GUILoadErr)?;
 
         let width = info.width as usize;
         let height = info.height as usize;
 
-        let mut data = Vec::with_capacity((width * height) as usize);
+        let mut data = Vec::with_capacity(width * height);
 
         match info.color_type {
             png::ColorType::Rgba => {
@@ -84,7 +85,7 @@ impl Texture {
                     data.push(0xFF000000 | (r << 16) | (g << 8) | b);
                 }
             }
-            _ => return Err("Unsupported PNG format".to_string()),
+            _ => return Err(EngineError::GUILoadErr),
         }
 
         Ok(Self { width, height, data })

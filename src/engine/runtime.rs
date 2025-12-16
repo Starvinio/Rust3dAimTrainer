@@ -17,6 +17,7 @@ use crate::engine::camera::FPS;
 
 pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let (event_loop, window) = window::event_loop_setup()?;
+    let mut window_size = window.inner_size();
 
     // Initialize softbuffer
     let context = Context::new(&window)?;
@@ -26,6 +27,18 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let mut camera = Camera::new(scenario.player_spawn);
     let mut user_input = InputState::new();
     let mut stats = Statistic::new();
+    let mut fps = FPS::init();
+    let mut timer = Timer::new();
+
+    let gui = match GUI::load_gui(GUI_TXT_PATH.to_str().unwrap()) {
+        Ok(g) => {
+            Some(g)
+        }
+        Err(e) => {
+            eprintln!("Warning: GUI failed to load: {}", e);
+            None
+        }
+    };
 
     // Initialize target vector
     let mut target_vec = TargetVec::init(&scenario.t_settings);
@@ -35,25 +48,16 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
     let mut target_tri_vec: Vec<TriToRaster> = Vec::with_capacity(256);
     let mut tri_clipped: Vec<TriToRaster> = Vec::with_capacity(4);
 
-    let mut window_size = window.inner_size();
     let mut proj_matrix = Mat4x4::projection(window_size.width as f32, window_size.height as f32);
 
     let mut rng = rand::thread_rng();
 
-    // FPS vars
-    let mut fps = FPS::init();
-
-    let mut timer = Timer::new();
-
     // SFX setup
     let mut stream_handle = rodio::OutputStreamBuilder::open_default_stream()?;
     rodio::OutputStream::log_on_drop(&mut stream_handle, false);
-
-    let file_hit_target = File::open(&*HIT_TARGET).unwrap();
+    let file_hit_target = File::open(&*HIT_TARGET).map_err(|_| EngineError::SFXErr)?;
     let src_hit_target = Decoder::new(BufReader::new(file_hit_target)).unwrap().buffered();
-
-    // Texture setup
-    let gui = GUI::load_gui(GUI_TXT_PATH.to_str().unwrap());
+    
 
     let mut pixel_buffer: Vec<u32> = vec![0; window_size.width as usize * window_size.height as usize];
 
@@ -245,15 +249,14 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                     // Crosshair is drawn based on users settings in config.toml
                     draw_crosshair(&mut pixel_buffer, CONFIG.crosshair, width, height);
 
-                    // Logo is drawn statically
-                    draw_texture_optimized(&mut pixel_buffer, width, height, &gui.logo, 0, 0);
-                    
-                    timer.draw_timer(&mut pixel_buffer, width, height, &gui);
+                    if let Some(gui) = &gui {
+                        draw_texture_optimized(&mut pixel_buffer, width, height, &gui.logo, 0, 0);
 
-                    fps.update_str(now);
-                    draw_fps(&fps, &mut pixel_buffer, width, height, &gui.digits_fps);
+                        timer.draw_timer(&mut pixel_buffer, width, height, &gui);
 
-
+                        fps.update_str(now);
+                        draw_fps(&fps, &mut pixel_buffer, width, height, &gui.digits_fps);
+                    }
                 /*
                     Remove Targets with hp <= 0 and spawn in a new one to keep the target count consistent
                 */  target_vec.vec.retain(|x| x.hp > 0);

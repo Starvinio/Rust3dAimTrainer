@@ -1,19 +1,27 @@
-
-
 #[derive(thiserror::Error, Debug)]
 pub enum EngineError {
     #[error("Failed to create event loop: {0}")]
-    EventLoop(#[from] winit::error::EventLoopError),
+    EventLoopErr(#[from] winit::error::EventLoopError),
 
     #[error("Failed to create window: {0}")]
-    Window(#[from] winit::error::OsError),
+    WindowErr(#[from] winit::error::OsError),
 
     #[error("Failed to initialize Softbuffer: {0}")]
-    Softbuffer(#[from] softbuffer::SoftBufferError),
+    SoftbufferErr(#[from] softbuffer::SoftBufferError),
 
     #[error("Failed to create audio stream: {0}")]
-    Stream(#[from] rodio::stream::StreamError),
+    StreamErr(#[from] rodio::stream::StreamError),
+
+    #[error("Failed to decode PNG: {0}")]
+    PngDecodeErr(#[from] png::DecodingError),
 
     #[error("ANSI compatibility check failed. Please run in a terminal.")]
-    ColorCheck
+    ColorCheckErr,
+
+    #[error("Failed to load GUI")]
+    GUILoadErr,
+
+    #[error("Failed to load Sound Effects")]
+    SFXErr,
+
 }

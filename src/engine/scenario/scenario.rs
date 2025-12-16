@@ -62,7 +62,7 @@ impl Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             t_settings: TargetSettings {
-                shape: TargetShape::Block,
+                shape: TargetShape::Square,
                 spawn: (
                     Vec3d::new(4.0, 4.0, 4.0),
                     Vec3d::new(-4.0, -4.0, 4.0)
@@ -84,7 +84,7 @@ impl Scenario {
             player_spawn: Vec3d::new(0.0, 1.0, -4.0),
             room: create_room(RoomType::Cube, 5.0),
             t_settings: TargetSettings {
-                shape: TargetShape::Block,
+                shape: TargetShape::Square,
                 spawn: (
                     Vec3d::new(0.4, 0.4, 4.0),
                     Vec3d::new(-0.4, -0.4, 4.0)
@@ -457,7 +457,7 @@ impl Scenario {
                     }),
             },
             gun: Gun::laser(),
-            allow_movement: true,
+            allow_movement: false,
         }
     }
     fn smooth_strafes_invincible() -> Self {
@@ -493,7 +493,7 @@ impl Scenario {
                     }),
             },
             gun: Gun::laser(),
-            allow_movement: true,
+            allow_movement: false,
         }
     }
     fn raw_control_invincible() -> Self {
@@ -551,7 +551,7 @@ impl Scenario {
                 movement: None,
             },
             gun: Gun::pistol(),
-            allow_movement: true,
+            allow_movement: false,
         }
     }
     fn pure_vertical_click() -> Self {
@@ -573,7 +573,7 @@ impl Scenario {
                 movement: None,
             },
             gun: Gun::pistol(),
-            allow_movement: true,
+            allow_movement: false,
         }
     }
     
