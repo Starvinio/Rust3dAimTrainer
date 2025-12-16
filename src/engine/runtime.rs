@@ -123,7 +123,9 @@ pub fn run(scenario: &mut Scenario) -> Result<(), EngineError>{
                                     end scenario to be able to display total time played
                                     print stats at the end
                                 */  stats.end_scenario();
-                                    stats.print_stats(&scenario.name, fps.total_frame_count / stats.scenario_playtime());
+                                    stats.print_stats(&scenario.name,
+                                                      if stats.scenario_playtime() < 1 {0} else {fps.total_frame_count / stats.scenario_playtime()}
+                                    );
 
                                     if play_again() {
                                         stats = Statistic::new();
